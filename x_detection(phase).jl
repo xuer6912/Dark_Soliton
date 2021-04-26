@@ -1,0 +1,238 @@
+using Plots, FourierGPE, LaTeXStrings,VortexDistributions, FFTW
+gr(fmt="png",legend=true,titlefontsize=12,size=(500,200),grid=false,colorbar=false);
+## convenient plotting method
+function showpsi(x,ψ)
+    p1 = plot(x,abs2.(ψ))
+    xlabel!(L"x/a_x");ylabel!(L"|\psi|^2")
+    p2 = plot(x,angle.(ψ))
+    xlabel!(L"x/a_x");ylabel!(L"\textrm{phase}(\psi)")
+    p = plot(p1,p2,layout=(2,1),size=(600,400))
+    return p
+end
+
+##system size
+
+L = (40.0,)
+N = (4096,)
+sim = Sim(L,N)
+@unpack_Sim sim;
+μ = 25.0
+
+## Declaring the potential
+import FourierGPE.V
+V(x,t) = 0.5*x^2
+
+## Initial condition
+##Let's define a useful Thomas-Fermi wavefunction
+ψ0(x,μ,g) = sqrt(μ/g)*sqrt(max(1.0-V(x,0.0)/μ,0.0)+im*0.0)
+x = X[1];
+ψi = ψ0.(x,μ,g)
+ϕi = kspace(ψi,sim) #sim uses Fourier transforms that are norm-preserving
+@pack_Sim! sim
+
+## harmonic
+sol = runsim(sim);
+ϕg = sol[end]
+ψg = xspace(ϕg,sim)
+p=plot(x,g*abs2.(ψg),fill=(0,0.2),size=(500,200),label=L"gn(x)")
+plot!(x,one.(x)*μ,label=L"\mu")
+plot!(x,V.(x,0.0),label=L"V(x)",legend=:topright)
+xlims!(-10,10); ylims!(0,1.3*μ)
+title!(L"\textrm{local}\; \mu(x)")
+xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+plot(p)
+
+
+
+## Soliton
+ψf = xspace(sol[end],sim)
+c = sqrt(μ)
+ξ = 1/c
+v = 0#.01*c
+xs = -0.5
+f = sqrt(1-(v/c)^2)
+ψs = @. ψf*(f*tanh(f*(x-xs)/ξ)+im*v/c)
+#showpsi(x,ψs)
+xlims!(-10,10)
+γ = 0.0
+tf = 8*pi/sqrt(2); t = LinRange(ti,tf,Nt)
+dt = 0.01π/μ
+ϕi = kspace(ψs,sim)
+simSoliton = Sim(sim;γ=γ,tf=tf,t=t,ϕi=ϕi)
+@time sols = runsim(simSoliton);
+##
+ϕf = sols[152]
+ψf = xspace(ϕf,simSoliton)
+ϕs=angle.(ψf)
+ϕs2=unwrap(ϕs)
+dx=diff(x)[1]
+#dϕs=diff(ϕs)/dx
+dϕs2=diff(ϕs2)/dx
+mask=g*abs2.(ψi).>0.1*μ
+plot(x[g*abs2.(ψi).>0.1*μ],abs2.(dϕs2[g*abs2.(ψi[1:end-1]).>0.1*μ]))
+#savefig("./test")
+##
+showpsi(x,ψf)
+savefig("./test2")
+
+##
+ϕs=angle.(ψs)
+ϕs2=unwrap(ϕs)
+dx=diff(x)[1]
+dϕs=diff(ϕs)/dx
+dϕs2=diff(ϕs2)/dx
+mask=g*abs2.(ψi).>0.1*μ
+
+##
+plot(x[g*abs2.(ψi).>0.1*μ],abs2.(dϕs2[g*abs2.(ψi[1:end-1]).>0.1*μ]))
+
+##
+
+anim = @animate for i in 1:length(t)-4 #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    y = g*abs2.(ψ)
+    ϕ=angle.(ψ)
+    ϕ2=unwrap(ϕ)
+    dx=diff(x)[1]
+    dϕ=diff(ϕ2)/dx
+    plot(x,y)
+    plot!(x[g*abs2.(ψi).>0.1*μ],abs2.(dϕ[g*abs2.(ψi[1:end-1]).>0.1*μ]))
+    xlims!(-10,10); ylims!(0,1.3*μ)
+    title!(L"\textrm{local}\; \mu(x)")
+    xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+end
+filename = "darksoliton_x.gif"
+gif(anim,filename,fps=30);
+
+##
+K
+
+K2=k2(K)
+##
+psi=XField(ψf,X,K,K2)
+##
+v=velocity2(psi)
+##
+vt=zeros(t[1:end-4])
+anim = @animate for i in 1:length(t)-4 #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    psi=XField(ψ,X,K,K2)
+    v=velocity2(psi)
+    y = g*abs2.(ψ)
+    ϕ=angle.(ψ)
+    ϕ2=unwrap(ϕ)
+    dx=diff(x)[1]
+    dϕ=diff(ϕ2)/dx
+    #plot(x,y)
+    #plot!(x[g*abs2.(ψi).>0.1*μ],abs2.(dϕ[g*abs2.(ψi[1:end-1]).>0.1*μ]))
+    plot(x[g*abs2.(ψi).>0.1*μ],v[g*abs2.(ψi).>0.1*μ])
+
+    xlims!(-10,10); ylims!(-100,100)
+    title!("velocity")
+    xlabel!(L"x/a_x"); ylabel!(L"v/c")
+end
+filename = "darksoliton_v.gif"
+
+
+##
+vt=zero(t[1:end])
+for i in 1:length(t) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    psi=XField(ψ,X,K,K2)
+    v=velocity2(psi)
+    y = g*abs2.(ψ)
+    ϕ=angle.(ψ)
+    ϕ2=unwrap(ϕ)
+    dx=diff(x)[1]
+    dϕ=diff(ϕ2)/dx
+    v_mask = v[g*abs2.(ψi).>0.1*μ]
+    #plot(x,y)
+    #plot!(x[g*abs2.(ψi).>0.1*μ],abs2.(dϕ[g*abs2.(ψi[1:end-1]).>0.1*μ]))
+    vt[i] = v_mask[findmax(abs.(v_mask))[2]]
+end
+##
+plot(t,vt)
+##
+maximum(v[g*abs2.(ψi).>0.1*μ])
+##
+v_mask = v[g*abs2.(ψi).>0.1*μ]
+v_mask[findmax(abs.(v_mask))[2]]
+##
+function velocity2(psi::XField{1})
+	@unpack psiX,K = psi; kx = K[1]; ψ = psiX
+	rho = abs2.(ψ)
+    ψx = gradient(psi::XField{1})
+	vx = @. imag(conj(ψ)*ψx)/rho; @. vx[isnan(vx)] = zero(vx[1])
+	return vx
+end
+
+##
+plot(x,v)
+
+
+
+##
+xt=zero(t[1:end])
+for i in 1:length(t) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    psi=XField(ψ,X,K,K2)
+    v=velocity2(psi)
+    v_mask = v[g*abs2.(ψi).>0.1*μ]
+    x_mask = x[g*abs2.(ψi).>0.1*μ]
+    #plot(x,y)
+    #plot!(x[g*abs2.(ψi).>0.1*μ],abs2.(dϕ[g*abs2.(ψi[1:end-1]).>0.1*μ]))
+    xt[i] = x_mask[findmax(abs.(v_mask))[2]]
+end
+
+plot(t,xt)
+
+##
+
+angle.(ψf)[end]-angle.(ψf)[1]
+##
+cos(real(sum(-0.5*im* log.(ψf ./ conj.(ψf))* diff(x)[1])))
+##
+plot(real.(-0.5*im* log.(ψf ./ conj.(ψf))))
+##
+plot(angle.(ψf))
+##
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+using JLD2
+##
+@save "phase.jld2" ψf
+##
+ψf=nothing
+##
+@load "phase.jld2" ψf
+##
+plot(abs2.(ψf))
