@@ -191,16 +191,41 @@ end
 plot(t,xt)
 
 ##
-
-angle.(ψf)[end]-angle.(ψf)[1]
-##
-cos(real(sum(-0.5*im* log.(ψf ./ conj.(ψf))* diff(x)[1])))
-##
-plot(real.(-0.5*im* log.(ψf ./ conj.(ψf))))
-##
-plot(angle.(ψf))
+S(ψ) =  @. real( -im/2*log(ψ/conj(ψ)))
+DS(ψ) = sum(diff(S(ψ)))
 ##
 
+ΔS=zero(t[1:end])
+for i in 1:length(t) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψd = xspace(sols[i],simSoliton)
+    ΔS[i] = DS(ψd[g*abs2.(ψi).>0.1*μ])
+end
+
+##
+plot(t,cos.(0.5*ΔS),label=false)
+
+title!("velocity vs time")
+savefig()
+##
+plot(t[1:end-1],diff(xt)/dt)
+##
+
+S2(ψ) = unwrap( angle.(ψ))
+DS2(ψ) = sum(diff(S2(ψ)))
+##
+
+ΔS2=zero(t[1:end-4])
+for i in 1:length(t)-4 #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψd = xspace(sols[i],simSoliton)
+    ΔS2[i] = DS2(ψd[g*abs2.(ψi).>0.1*μ])
+   
+end
+
+##
+plot(cos.(0.5*ΔS2))
+##
 
 
 
