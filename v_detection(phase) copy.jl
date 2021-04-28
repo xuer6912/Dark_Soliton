@@ -13,7 +13,7 @@ end
 ##system size
 
 L = (40.0,)
-N = (1028,)
+N = (2048,)
 sim = Sim(L,N)
 @unpack_Sim sim;
 μ = 25.0
@@ -53,6 +53,7 @@ f = sqrt(1-(v/c)^2)
 #showpsi(x,ψs)
 xlims!(-10,10)
 γ = 0.0
+Nt=800
 tf = 8*pi/sqrt(2); t = LinRange(ti,tf,Nt)
 dt=diff(t)[1]
 #dt = 0.01π/μ
@@ -66,27 +67,6 @@ simSoliton = Sim(sim;γ=γ,tf=tf,t=t,ϕi=ϕi)
 #ϕs=angle.(ψf)
 #ϕs2=unwrap(ϕs)
 dx=diff(x)[1]
-#dϕs=diff(ϕs)/dx
-#dϕs2=diff(ϕs2)/dx
-#mask=g*abs2.(ψi).>0.1*μ
-#plot(x[g*abs2.(ψi).>0.1*μ],abs2.(dϕs2[g*abs2.(ψi[1:end-1]).>0.1*μ]))
-#savefig("./test")
-##
-#showpsi(x,ψf)
-#savefig("./test2")
-
-##
-ϕs=angle.(ψs)
-ϕs2=unwrap(ϕs)
-dx=diff(x)[1]
-dϕs=diff(ϕs)/dx
-dϕs2=diff(ϕs2)/dx
-mask=g*abs2.(ψi).>0.1*μ
-
-##
-plot(x[g*abs2.(ψi).>0.1*μ],abs2.(dϕs2[g*abs2.(ψi[1:end-1]).>0.1*μ]))
-
-##
 
 anim = @animate for i in 1:length(t)-4 #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
@@ -187,8 +167,9 @@ for i in 1:length(t) #make it periodic by ending early
     #plot!(x[g*abs2.(ψi).>0.1*μ],abs2.(dϕ[g*abs2.(ψi[1:end-1]).>0.1*μ]))
     xt[i] = x_mask[findmax(abs.(v_mask))[2]]
 end
+dt=t[2]-t[1]
+plot(t[2:end],xt[2:end])
 
-plot(t,xt)
 
 ##
 S(ψ) =  @. real( -im/2*(log(ψ)-log(conj(ψ))))
@@ -203,12 +184,18 @@ for i in 1:length(t) #make it periodic by ending early
 end
 
 ##
-plot(t,cos.(0.5*ΔS),label=false)
+p1=plot(t,ΔS,label=false,size=(600,400),title="phase change")
+p2=plot(t,cos.(ΔS/2),label=false,size=(600,400),title="analytic velocity")
+p3=plot(t[2:end-1],diff((xt[2:end]))/dt,label=false,size=(600,400), title="numerical velocity")
 
-title!("velocity vs time")
+plot(p1,p2,p3,layout=(3,1))
+#title!("velocity vs time")
+##
+
 
 ##
-plot(t[1:end-1],diff(xt)/dt)
+##
+plot(t[3:end],diff(xt[2:end])/dt)
 ##
 
 S2(ψ) = angle.(ψ)
