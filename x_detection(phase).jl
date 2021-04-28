@@ -34,15 +34,13 @@ x = X[1];
 sol = runsim(sim);
 ϕg = sol[end]
 ψg = xspace(ϕg,sim)
-p=plot(x,g*abs2.(ψg),fill=(0,0.2),size=(500,200),label=L"gn(x)")
-plot!(x,one.(x)*μ,label=L"\mu")
-plot!(x,V.(x,0.0),label=L"V(x)",legend=:topright)
-xlims!(-10,10); ylims!(0,1.3*μ)
-title!(L"\textrm{local}\; \mu(x)")
-xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
-plot(p)
-
-
+#p=plot(x,g*abs2.(ψg),fill=(0,0.2),size=(500,200),label=L"gn(x)")
+#plot!(x,one.(x)*μ,label=L"\mu")
+#plot!(x,V.(x,0.0),label=L"V(x)",legend=:topright)
+#xlims!(-10,10); ylims!(0,1.3*μ)
+#title!(L"\textrm{local}\; \mu(x)")
+#xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+#plot(p)
 
 ## Soliton
 ψf = xspace(sol[end],sim)
@@ -56,9 +54,11 @@ f = sqrt(1-(v/c)^2)
 xlims!(-10,10)
 γ = 0.0
 tf = 8*pi/sqrt(2); t = LinRange(ti,tf,Nt)
-dt = 0.01π/μ
+dt=t[2]-t[1]
+#dt = 0.01π/μ
 ϕi = kspace(ψs,sim)
 simSoliton = Sim(sim;γ=γ,tf=tf,t=t,ϕi=ϕi)
+##
 @time sols = runsim(simSoliton);
 ##
 ϕf = sols[152]
