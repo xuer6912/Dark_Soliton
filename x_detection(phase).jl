@@ -13,7 +13,7 @@ end
 ##system size
 
 L = (40.0,)
-N = (4096,)
+N = (1028,)
 sim = Sim(L,N)
 @unpack_Sim sim;
 μ = 25.0
@@ -53,8 +53,8 @@ f = sqrt(1-(v/c)^2)
 #showpsi(x,ψs)
 xlims!(-10,10)
 γ = 0.0
-tf = 8*pi/sqrt(2); t = LinRange(ti,tf,Nt)
-dt=t[2]-t[1]
+tf = 2*pi/sqrt(2); t = LinRange(ti,tf,Nt)
+dt=fiff(t)[1]
 #dt = 0.01π/μ
 ϕi = kspace(ψs,sim)
 simSoliton = Sim(sim;γ=γ,tf=tf,t=t,ϕi=ϕi)
@@ -192,7 +192,7 @@ plot(t,xt)
 
 ##
 S(ψ) =  @. real( -im/2*log(ψ/conj(ψ)))
-DS(ψ) = sum(diff(S(ψ)))
+DS(ψ) = sum(diff(unwrap(S(ψ))))
 ##
 
 ΔS=zero(t[1:end])
@@ -211,8 +211,8 @@ savefig()
 plot(t[1:end-1],diff(xt)/dt)
 ##
 
-S2(ψ) = unwrap( angle.(ψ))
-DS2(ψ) = sum(diff(S2(ψ)))
+S2(ψ) = angle.(ψ)
+DS2(ψ) = sum(diff(unwrap(S2(ψ))))
 ##
 
 ΔS2=zero(t[1:end-4])
@@ -226,14 +226,19 @@ end
 ##
 plot(cos.(0.5*ΔS2))
 ##
-
-
-
-
-
-
-
-
+plot(x,S(ψf))
+plot!(x,S2(ψf))
+##
+plot(x,unwrap(S(ψf)))
+plot!(x,unwrap(S2(ψf)))
+##
+p1=plot(imag(-im/2*log.(ψf ./ conj.(ψf))))
+minimum(imag(-im/2*log.(ψf ./ conj.(ψf))))
+##
+##
+plot(x[g*abs2.(ψi).>0.01*μ],unwrap(S(ψf[g*abs2.(ψi).>0.01*μ])))
+plot!(x[g*abs2.(ψi).>0.01*μ],unwrap(S2(ψf[g*abs2.(ψi).>0.01*μ])))
+##
 
 
 
