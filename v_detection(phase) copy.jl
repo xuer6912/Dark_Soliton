@@ -154,7 +154,7 @@ plot(x,v)
 
 
 
-##
+##numerical method for position
 xt=zero(t[1:end])
 for i in 1:length(t) #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
@@ -170,6 +170,10 @@ end
 dt=t[2]-t[1]
 plot(t[2:end],xt[2:end])
 
+##
+
+
+
 
 ##
 S(ψ) =  @. real( -im/2*(log(ψ)-log(conj(ψ))))
@@ -180,15 +184,15 @@ DS(ψ) = sum(diff(unwrap(S(ψ))))
 for i in 1:length(t) #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
     ψd = xspace(sols[i],simSoliton)
-    ΔS[i] = DS(ψd[g*abs2.(ψi).>0.1*μ])
+    ΔS[i] = DS(ψd[g*abs2.(ψi).>0.2*μ])
 end
 
 ##
 p1=plot(t,ΔS,label=false,size=(600,400),title="phase change")
 p2=plot(t,cos.(ΔS/2),label=false,size=(600,400),title="analytic velocity")
 p3=plot(t[2:end-1],diff((xt[2:end]))/dt,label=false,size=(600,400), title="numerical velocity")
-
-plot(p1,p2,p3,layout=(3,1))
+p4=plot(t[2:end],xt[2:end],size=(600,400))
+plot(p1,p2,p3,p4,layout=(4,1))
 #title!("velocity vs time")
 ##
 
