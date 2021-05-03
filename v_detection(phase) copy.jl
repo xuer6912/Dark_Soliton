@@ -180,13 +180,20 @@ S(ψ) =  @. real( -im/2*(log(ψ)-log(conj(ψ))))
 DS(ψ) = sum(diff(unwrap(S(ψ))))
 ##
 
+
 ΔS=zero(t[1:end])
 for i in 1:length(t) #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
     ψd = xspace(sols[i],simSoliton)
-    ΔS[i] = DS(ψd[g*abs2.(ψi).>0.2*μ])
+    ΔS[i] = DS(ψd[g*abs2.(ψi).>0.1*μ])
+    if ΔS[i] < 0
+        ΔS[i] += 0
+    else
+        ΔS[i] += -2*pi
+    end
 end
-
+##
+savefig("velocity comparison")
 ##
 p1=plot(t,ΔS,label=false,size=(600,400),title="phase change")
 p2=plot(t,cos.(ΔS/2),label=false,size=(600,400),title="analytic velocity")
@@ -210,7 +217,7 @@ DS2(ψ) = sum(diff(unwrap(S2(ψ))))
 for i in 1:length(t)-4 #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
     ψd = xspace(sols[i],simSoliton)
-    ΔS2[i] = DS2(ψd[g*abs2.(ψi).>0.1*μ])
+    ΔS2[i] = DS2(ψd[g*abs2.(ψi).>0])
    
 end
 
@@ -251,14 +258,3 @@ plot(imag.(log.(ψf))-imag.(log.(conj.(ψf))))
 
 ##
 
-
-
-using JLD2
-##
-@save "phase.jld2" ψf
-##
-ψf=nothing
-##
-@load "phase.jld2" ψf
-##
-plot(abs2.(ψf))
