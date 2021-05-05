@@ -150,15 +150,15 @@ for i in 1:length(t) #make it periodic by ending early
 end
 
 ##
-
+xmax=findmax(xat)[1]
 plot(t, xat, label="analytic")
 plot!(t[2:end], xnt[2:end],label ="numerical")
-plot!(t,-0.5cos.(t/sqrt(2)))
+plot!(t,xmax*sin.(t/sqrt(2)))
 ##
 savefig("position comp")
 #title!("soliton position")
 ##
-ΔSt=zero(t[1:end])
+ΔSt=zero(t)
 for i in 1:length(t) #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
     ψd = xspace(sols[i],simSoliton)
@@ -172,8 +172,13 @@ end
 ##
 
 plot(t,cos.(ΔSt/2),label="phase")
-plot!(t[3:end],diff((xnt[2:end]))/dt,label="finite dif")
-plot!(t,0.5/sqrt(2)*sin.(t/sqrt(2)),label = "sine"  )
+#plot!(t[3:end],diff((xnt[2:end]))/dt,label="finite dif")
+plot!(t,xmax/sqrt(2)*cos.(t/sqrt(2)),label = "sine"  )
 ##
 savefig("velocity comp")
 ##
+
+vnt = cos.(ΔSt/2)
+##
+a=findmin(vnt[1:100])[2] ;b=findmin(vnt[101:200])[2]
+period = (t[100+b-1]-t[a-1])/(2*pi)
