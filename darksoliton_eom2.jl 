@@ -49,8 +49,8 @@ sol = runsim(sim);
 ψf = xspace(sol[end],sim)
 c = sqrt(μ)
 ξ = 1/c
-v = .01*c
-xs = 0
+v = 0#.01*c
+xs = -0.5
 f = sqrt(1-(v/c)^2)
 ψs = @. ψf*(f*tanh(f*(x-xs)/ξ)+im*v/c)
 xlims!(-10,10)
