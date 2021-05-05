@@ -153,6 +153,8 @@ end
 
 plot(t, xat, label="analytic")
 plot!(t[2:end], xnt[2:end],label ="numerical")
+plot!(t,-0.5cos.(t/sqrt(2)))
+##
 savefig("position comp")
 #title!("soliton position")
 ##
@@ -169,9 +171,9 @@ for i in 1:length(t) #make it periodic by ending early
 end
 ##
 
-plot(t,cos.(ΔSt/2),label="va")
-plot!(t[3:end],diff((xnt[2:end]))/dt,label="vn")
-
+plot(t,cos.(ΔSt/2),label="phase")
+plot!(t[3:end],diff((xnt[2:end]))/dt,label="finite dif")
+plot!(t,0.5/sqrt(2)*sin.(t/sqrt(2)),label = "sine"  )
 ##
 savefig("velocity comp")
 ##
