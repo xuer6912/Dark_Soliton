@@ -9,6 +9,7 @@ function showpsi(x,ψ)
     p = plot(p1,p2,layout=(2,1),size=(600,400))
     return p
 end
+
 function velocity2(psi::XField{1})
 	@unpack psiX,K = psi; kx = K[1]; ψ = psiX
 	rho = abs2.(ψ)
@@ -16,8 +17,11 @@ function velocity2(psi::XField{1})
 	vx = @. imag(conj(ψ)*ψx)/rho; @. vx[isnan(vx)] = zero(vx[1])
 	return vx
 end
-S(ψ) =  @. real( -im/2*(log(ψ)-log(conj(ψ))))
-DS(ψ) = sum(diff(unwrap(S(ψ))))
+
+S(ψ) =  @. real( -im/2*(log(ψ)-log(conj(ψ))))# phase of wave
+
+DS(ψ) = sum(diff(unwrap(S(ψ)))) #phase change
+
 ##system size
 
 L = (40.0,)
@@ -60,6 +64,7 @@ simSoliton = Sim(sim;γ=γ,tf=tf,t=t,ϕi=ϕi)
 ϕf = sols[152]
 ψf = xspace(ϕf,simSoliton)
 dx=diff(x)[1]
+dt=diff(t)[1]
 K2=k2(K)
 #psi=XField(ψf,X,K,K2)
 ##numerical method for position
@@ -75,28 +80,98 @@ for i in 1:length(t) #make it periodic by ending early
     #plot!(x[g*abs2.(ψi).>0.1*μ],abs2.(dϕ[g*abs2.(ψi[1:end-1]).>0.1*μ]))
     xt[i] = x_mask[findmax(abs.(v_mask))[2]]
 end
-dt=t[2]-t[1]
+
+##
+psi=XField(ψf,X,K,K2)
+v=velocity2(psi)
+plot(v[g*abs2.(ψi).>0.1*μ])
+##
 plot(t[2:end],xt[2:end])
 ##
-ΔS=zero(t[1:end])
+ΔSt=zero(t[1:end])
 for i in 1:length(t) #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
     ψd = xspace(sols[i],simSoliton)
-    ΔS[i] = DS(ψd[g*abs2.(ψi).>0.1*μ])
-    if ΔS[i] < 0
-        ΔS[i] += 0
+    ΔSt[i] = DS(ψd[g*abs2.(ψi).>0.1*μ])
+    if ΔSt[i] < 0
+        ΔSt[i] += 0
     else
-        ΔS[i] += -2*pi
+        ΔSt[i] += -2*pi
     end
 end
 ##
 savefig("velocity comparison")
 ##
-p1=plot(t,ΔS,label=false,size=(600,400),title="phase change")
-p2=plot(t,cos.(ΔS/2),label=false,size=(600,400),title="analytic velocity")
+p1=plot(t,ΔSt,label=false,size=(600,400),title="phase change")
+p2=plot(t,cos.(ΔSt/2),label=false,size=(600,400),title="analytic velocity")
 p3=plot(t[2:end-1],diff((xt[2:end]))/dt,label=false,size=(600,400), title="numerical velocity")
 p4=plot(t[2:end],xt[2:end],size=(600,400))
 plot(p1,p2,p3,p4,layout=(4,1))
 #title!("velocity vs time")
 
 
+##
+p1 = plot(unwrap(angle.(ψf[g*abs2.(ψi).>0.1*μ])),label=false,title="numerical phase")
+p2 = plot(unwrap(S(ψf[g*abs2.(ψi).>0.1*μ])),label=false,title="analytical phase")
+plot(p1,p2, layout=(2,1))
+##
+plot(diff(S(ψf[g*abs2.(ψi).>0.1*μ]))/dt)
+
+##
+p1 = plot(abs2.(ψf[g*abs2.(ψi).>0.1*μ]),label=false,title="density")
+p2 = plot(unwrap(S(ψf[g*abs2.(ψi).>0.1*μ])),label=false,title="analytical phase")
+ϕ =    unwrap(S(ψf[g*abs2.(ψi).>0.1*μ]))
+p3 = plot(diff(ϕ)/dx,label=false,title="phase gradient")
+plot(p1,p2,p3,layout=(3,1),size=(600,500))
+
+##
+ΔS = DS(ψf[g*abs2.(ψi).>0.1*μ])
+dϕ = diff(ϕ)/(dx*ΔS)
+xm=x[g*abs2.(ψi).>0.1*μ]
+plot(xm[1:end-1],dϕ)
+##
+xa = xm[1:end-1]'*dϕ *dx
+##
+xat = zero(t)#(nearest grid point)
+xnt = zero(t)
+for i in 1:length(t) #make it periodic by ending early
+    ψ = xspace(sols[i],simSoliton)
+    psi=XField(ψ,X,K,K2)
+    v=velocity2(psi)
+    v_mask = v[g*abs2.(ψi).>0.1*μ]
+    x_mask = x[g*abs2.(ψi).>0.1*μ]
+    xnt[i] = x_mask[findmax(abs.(v_mask))[2]]
+    ΔS = DS(ψ[g*abs2.(ψi).>0.1*μ])
+    ϕ =    unwrap(S(ψ[g*abs2.(ψi).>0.1*μ]))
+    dϕ = diff(ϕ)/(dx*ΔS)
+    xm = x[g*abs2.(ψi).>0.1*μ]
+    xat[i] = xm[1:end-1]'*dϕ *dx
+  
+end
+
+##
+
+plot(t, xat, label="analytic")
+plot!(t[2:end], xnt[2:end],label ="numerical")
+savefig("position comp")
+#title!("soliton position")
+##
+ΔSt=zero(t[1:end])
+for i in 1:length(t) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψd = xspace(sols[i],simSoliton)
+    ΔSt[i] = DS(ψd[g*abs2.(ψi).>0.1*μ])
+    if ΔSt[i] < 0
+        ΔSt[i] += 0
+    else
+        ΔSt[i] += -2*pi
+    end
+end
+##
+
+plot(t,cos.(ΔSt/2),label="va")
+plot!(t[3:end],diff((xnt[2:end]))/dt,label="vn")
+
+##
+savefig("velocity comp")
+##
