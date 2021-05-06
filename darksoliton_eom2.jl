@@ -153,7 +153,7 @@ end
 
 plot(t, xat, label="analytic")
 plot!(t[2:end], xnt[2:end],label ="numerical")
-plot!(t,-0.5cos.(t/sqrt(2)))
+#plot!(t,-0.5cos.(t/sqrt(2)))
 ##
 savefig("position comp")
 #title!("soliton position")

@@ -105,6 +105,8 @@ psi=XField(ψf,X,K,K2)
 v=velocity2(psi)
 plot(v[g*abs2.(ψi).>0.1*μ])
 ##
+sum(v[g*abs2.(ψi).>0.1*μ])*dx/c
+##
 plot(t[2:end],xt[2:end])
 ##
 ##
@@ -133,7 +135,7 @@ for i in 1:length(t) #make it periodic by ending early
     ψ = xspace(sols2[i],simSoliton)
     psi=XField(ψ,X,K,K2)
     v=velocity2(psi)
-    mask = g*abs2.(ψi).>0.6*μ
+    mask = g*abs2.(ψi).>0.1*μ
     v_mask = v[mask]
     x_mask = x[mask]
     xnt[i] = x_mask[findmax(abs.(v_mask))[2]]
@@ -147,8 +149,8 @@ end
 
 ##
 xmax=findmax(xnt)[1]
-plot(t, xat, label="analytic")
-plot!(t[2:end], xnt[2:end],label ="numerical")
+plot(t[3:end], xat[3:end], label="analytic")
+#plot!(t[2:end], xnt[2:end],label ="numerical")
 #plot!(t,xmax*sin.(t/sqrt(2)))
 ##
 savefig("position comp")
@@ -193,36 +195,93 @@ plot(p1,p2,p3,p4,layout=(4,1))
 #title!("velocity vs time")
 savefig("velocity comparison")
 
-##
-plot(t,cos.( ΔSt2/2))
-
-
-## 
-
-##
-
 
 ##
 a=findmin(vat[1:100])[2] ;b=findmin(vat[101:200])[2]
 period = (t[100+b-1]-t[a-1])/(2*pi)
 ##
+
 anim = @animate for i in 1:length(t)-4 #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
-    ψ = xspace(sols[i],simSoliton)
+    ψ = xspace(sols2[i],simSoliton)
+
+    mask = g*abs2.(ψi).>0
+    a = (1:length(mask))[mask]
+    mask2 = a[1]-25:a[end]+25
+    ϕ1 = unwrap(angle.(ψ[mask2]))
+    ϕ2 = unwrap(S(ψ[mask2]))
+    p1=plot(x[mask2],ϕ1)
+    #plot!(x[mask2],ϕ2)
+    plot!(x[g*abs2.(ψi).>0.1*μ],abs2.(dϕ[g*abs2.(ψi[1:end-1]).>0.1*μ]))
+    xlims!(-10,10); ylims!(-2*pi,2*pi)
+    #title!(L"\textrm{local}\; \mu(x)")
+    xlabel!(L"x/a_x"); ylabel!(L"phase")
     y = g*abs2.(ψ)
-    ϕ=angle.(ψ)
-    ϕ2=unwrap(ϕ)
-    dx=diff(x)[1]
-    dϕ=diff(ϕ2)/dx
-    plot(x,y)
-    #plot!(x[g*abs2.(ψi).>0.1*μ],abs2.(dϕ[g*abs2.(ψi[1:end-1]).>0.1*μ]))
+    p2 = plot(x,y)
     xlims!(-10,10); ylims!(0,1.3*μ)
     title!(L"\textrm{local}\; \mu(x)")
     xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+    plot(p1,p2,layout=(2,1),size=(400,400))
 end
-filename = "grey soliton(0.3).gif"
+filename = "phase.gif"
 gif(anim,filename,fps=30)
 ##
-plot(@.abs2(f*tanh(f*(x-xs)/ξ)+im*v/c))
+p1=plot((@.real(f*tanh(f*(x-xs)/ξ)+im*v/c)))
+plot!(abs2.(ψi)/(μ/g))
+p2=plot((@.imag(f*tanh(f*(x-xs)/ξ)+im*v/c)))
+plot(p1,p2,layout=(2,1),size=(400,400))
+##
+mask = g*abs2.(ψi).>0
+a = (1:length(mask))[mask]
 
 
+##
+anim = @animate for i in 1:length(t)-4 #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols2[i],simSoliton)
+    
+    mask = g*abs2.(ψi).>0.1*μ
+    a = findmin(abs2.(ψ[mask]))[2]
+    ϕ = unwrap(angle.(ψ[mask]))
+    xmask = x[mask]
+    p1=plot(xmask[a-100:a+100],ϕ[a-100:a+100])
+    xlims!(-10,10); ylims!(-2*pi,2*pi)
+
+    xlabel!(L"x/a_x"); ylabel!(L"phase")
+ 
+end
+filename = "phase2.gif"
+gif(anim,filename,fps=30)
+##
+mask = g*abs2.(ψi).>0.1*μ
+a = findmin(abs2.(ψf[mask]))[2]
+
+
+ΔSt3=zero(t[1:end])
+for i in 1:length(t) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols2[i],simSoliton)
+    mask = g*abs2.(ψi).>0.1*μ
+    ψm = ψ[mask]
+    a = findmin(abs2.(ψm))[2]
+    #ϕ = unwrap(angle.(ψ[mask]))
+    xmask = x[mask]
+
+    ΔSt3[i] = DS(ψm[a-50:a+50])
+    if ΔSt3[i] < 0
+        ΔSt3[i] += 0
+    else
+        ΔSt3[i] += -2*pi
+    end
+end
+##
+
+p1=plot(t,cos.(ΔSt/2),label=false,size=(600,400),title=L"v_a(1)")
+p2=plot(t,cos.(ΔSt3/2),label=false,size=(600,400),title="symmetric sampling")
+p3=plot(t,cos.( ΔSt2/2),label=false,title=L"(n0)")
+p4=plot(t[2:end-1],diff((xt[2:end]))/dt,label=false,size=(600,400), title="numerical velocity")
+
+plot(p1,p2,p3,p4,layout=(4,1))
+##
+savefig("velocity comp_3")
+##
