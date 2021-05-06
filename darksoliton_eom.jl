@@ -21,14 +21,18 @@ end
 S(ψ) =  @. real( -im/2*(log(ψ)-log(conj(ψ))))# phase of wave
 
 DS(ψ) = sum(diff(unwrap(S(ψ)))) #phase change
+##
+#new method for velocity
+S(ψ) =  @. real( -im/2*(log(ψ)-log(conj(ψ))))# phase of wave
 
+DS2(ψ) = sum(diff(unwrap(S(ψ))) .*abs2.(ψi[1:end-1]))/(μ/g)
 ##system size
 
-L = (40.0,)
+L = (80.0,)
 N = (2048,)
 sim = Sim(L,N)
 @unpack_Sim sim;
-μ = 25.0
+μ = 25
 
 ## Declaring the potential
 import FourierGPE.V
@@ -41,11 +45,12 @@ x = X[1];
 ϕi = kspace(ψi,sim) #sim uses Fourier transforms that are norm-preserving
 @pack_Sim! sim
 
-## harmonic
+# harmonic
 sol = runsim(sim);
 ϕg = sol[end]
 ψg = xspace(ϕg,sim)
-#Soliton imprinting
+##
+#Soliton imprinting &damping
 ψf = xspace(sol[end],sim)
 c = sqrt(μ)
 ξ = 1/c
@@ -53,15 +58,29 @@ v = .01*c
 xs = 0
 f = sqrt(1-(v/c)^2)
 ψs = @. ψf*(f*tanh(f*(x-xs)/ξ)+im*v/c)
-xlims!(-10,10)
-γ = 0.0
-tf = 8*pi/sqrt(2); t = LinRange(ti,tf,Nt)
+γ = 0.1
+tf = pi/sqrt(2); t = LinRange(ti,tf,Nt)
 #dt = 0.01π/μ
 ϕi = kspace(ψs,sim)
 simSoliton = Sim(sim;γ=γ,tf=tf,t=t,ϕi=ϕi)
 @time sols = runsim(simSoliton);
+
+
+
+##Soliton evolution
+ϕs = sols[end]
+ψs = xspace(ϕs,simSoliton)
+plot(abs2.(ψs))
 ##
-ϕf = sols[152]
+γ = 0.
+Nt=400
+tf = 16*pi/sqrt(2); t = LinRange(ti,tf,Nt)
+#dt = 0.01π/μ
+ϕi = kspace(ψs,sim)
+simSoliton = Sim(sim;γ=γ,tf=tf,t=t,ϕi=ϕi)
+@time sols2 = runsim(simSoliton);
+##
+ϕf = sols2[152]
 ψf = xspace(ϕf,simSoliton)
 dx=diff(x)[1]
 dt=diff(t)[1]
@@ -71,7 +90,7 @@ K2=k2(K)
 xt=zero(t)#(nearest grid point)
 for i in 1:length(t) #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
-    ψ = xspace(sols[i],simSoliton)
+    ψ = xspace(sols2[i],simSoliton)
     psi=XField(ψ,X,K,K2)
     v=velocity2(psi)
     v_mask = v[g*abs2.(ψi).>0.1*μ]
@@ -88,34 +107,10 @@ plot(v[g*abs2.(ψi).>0.1*μ])
 ##
 plot(t[2:end],xt[2:end])
 ##
-ΔSt=zero(t[1:end])
-for i in 1:length(t) #make it periodic by ending early
-    #ψi = ψ0.(x,μ,g)
-    ψd = xspace(sols[i],simSoliton)
-    ΔSt[i] = DS(ψd[g*abs2.(ψi).>0.1*μ])
-    if ΔSt[i] < 0
-        ΔSt[i] += 0
-    else
-        ΔSt[i] += -2*pi
-    end
-end
-##
-savefig("velocity comparison")
-##
-p1=plot(t,ΔSt,label=false,size=(600,400),title="phase change")
-p2=plot(t,cos.(ΔSt/2),label=false,size=(600,400),title="analytic velocity")
-p3=plot(t[2:end-1],diff((xt[2:end]))/dt,label=false,size=(600,400), title="numerical velocity")
-p4=plot(t[2:end],xt[2:end],size=(600,400))
-plot(p1,p2,p3,p4,layout=(4,1))
-#title!("velocity vs time")
-
-
 ##
 p1 = plot(unwrap(angle.(ψf[g*abs2.(ψi).>0.1*μ])),label=false,title="numerical phase")
 p2 = plot(unwrap(S(ψf[g*abs2.(ψi).>0.1*μ])),label=false,title="analytical phase")
 plot(p1,p2, layout=(2,1))
-##
-plot(diff(S(ψf[g*abs2.(ψi).>0.1*μ]))/dt)
 
 ##
 p1 = plot(abs2.(ψf[g*abs2.(ψi).>0.1*μ]),label=false,title="density")
@@ -135,34 +130,50 @@ xa = xm[1:end-1]'*dϕ *dx
 xat = zero(t)#(nearest grid point)
 xnt = zero(t)
 for i in 1:length(t) #make it periodic by ending early
-    ψ = xspace(sols[i],simSoliton)
+    ψ = xspace(sols2[i],simSoliton)
     psi=XField(ψ,X,K,K2)
     v=velocity2(psi)
-    v_mask = v[g*abs2.(ψi).>0.1*μ]
-    x_mask = x[g*abs2.(ψi).>0.1*μ]
+    mask = g*abs2.(ψi).>0.6*μ
+    v_mask = v[mask]
+    x_mask = x[mask]
     xnt[i] = x_mask[findmax(abs.(v_mask))[2]]
-    ΔS = DS(ψ[g*abs2.(ψi).>0.1*μ])
-    ϕ =    unwrap(S(ψ[g*abs2.(ψi).>0.1*μ]))
+    ΔS = DS(ψ[mask])
+    ϕ =    unwrap(S(ψ[mask]))
     dϕ = diff(ϕ)/(dx*ΔS)
-    xm = x[g*abs2.(ψi).>0.1*μ]
+    xm = x[mask]
     xat[i] = xm[1:end-1]'*dϕ *dx
   
 end
 
 ##
-xmax=findmax(xat)[1]
+xmax=findmax(xnt)[1]
 plot(t, xat, label="analytic")
 plot!(t[2:end], xnt[2:end],label ="numerical")
-plot!(t,xmax*sin.(t/sqrt(2)))
+#plot!(t,xmax*sin.(t/sqrt(2)))
 ##
 savefig("position comp")
-#title!("soliton position")
+
 ##
-ΔSt=zero(t)
+N = sum(abs2.(ψi)*dx)
+##
+ΔSt2=zero(t)
 for i in 1:length(t) #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
-    ψd = xspace(sols[i],simSoliton)
-    ΔSt[i] = DS(ψd[g*abs2.(ψi).>0.1*μ])
+    ψd = xspace(sols2[i],simSoliton)
+    ΔSt2[i] = DS2(ψd)
+    if ΔSt2[i] < 0
+        ΔSt2[i] += 0
+    else
+        ΔSt2[i] += -2*pi
+    end
+
+end
+##
+ΔSt=zero(t[1:end])
+for i in 1:length(t) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψd = xspace(sols2[i],simSoliton)
+    ΔSt[i] = DS(ψd[g*abs2.(ψi).>0.001*μ])
     if ΔSt[i] < 0
         ΔSt[i] += 0
     else
@@ -171,14 +182,47 @@ for i in 1:length(t) #make it periodic by ending early
 end
 ##
 
-plot(t,cos.(ΔSt/2),label="phase")
-#plot!(t[3:end],diff((xnt[2:end]))/dt,label="finite dif")
-plot!(t,xmax/sqrt(2)*cos.(t/sqrt(2)),label = "sine"  )
-##
-savefig("velocity comp")
+p1=plot(t,ΔSt,label=false,size=(600,400),title="phase change")
+p2=plot(t,cos.(ΔSt/2),label=false,size=(600,400),title="analytic velocity")
+p3=plot(t,cos.( ΔSt2/2))
+p4=plot(t[2:end-1],diff((xt[2:end]))/dt,label=false,size=(600,400), title="numerical velocity")
+
+plot(p1,p2,p3,p4,layout=(4,1))
 ##
 
-vnt = cos.(ΔSt/2)
+#title!("velocity vs time")
+savefig("velocity comparison")
+
 ##
-a=findmin(vnt[1:100])[2] ;b=findmin(vnt[101:200])[2]
+plot(t,cos.( ΔSt2/2))
+
+
+## 
+
+##
+
+
+##
+a=findmin(vat[1:100])[2] ;b=findmin(vat[101:200])[2]
 period = (t[100+b-1]-t[a-1])/(2*pi)
+##
+anim = @animate for i in 1:length(t)-4 #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    y = g*abs2.(ψ)
+    ϕ=angle.(ψ)
+    ϕ2=unwrap(ϕ)
+    dx=diff(x)[1]
+    dϕ=diff(ϕ2)/dx
+    plot(x,y)
+    #plot!(x[g*abs2.(ψi).>0.1*μ],abs2.(dϕ[g*abs2.(ψi[1:end-1]).>0.1*μ]))
+    xlims!(-10,10); ylims!(0,1.3*μ)
+    title!(L"\textrm{local}\; \mu(x)")
+    xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+end
+filename = "grey soliton(0.3).gif"
+gif(anim,filename,fps=30)
+##
+plot(@.abs2(f*tanh(f*(x-xs)/ξ)+im*v/c))
+
+
