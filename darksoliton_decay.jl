@@ -45,7 +45,7 @@ f = sqrt(1-(v/c)^2)
 xlims!(-10,10)
 γ = 0.01
 Nt=800
-tf = 8*pi/sqrt(2); t = LinRange(ti,tf,Nt)
+tf = 16*pi/sqrt(2); t = LinRange(ti,tf,Nt)
 dt=diff(t)[1]
 ϕi = kspace(ψs,sim)
 simSoliton = Sim(sim;γ=γ,tf=tf,t=t,ϕi=ϕi)
