@@ -10,6 +10,19 @@ function showpsi(x,ψ)
     return p
 end
 
+
+
+function velocity2(psi::XField{1})
+	@unpack psiX,K = psi; kx = K[1]; ψ = psiX
+	rho = abs2.(ψ)
+    ψx = gradient(psi::XField{1})
+	vx = @. imag(conj(ψ)*ψx)/rho; @. vx[isnan(vx)] = zero(vx[1])
+	return vx
+end
+
+S(ψ) =  @. real( -im/2*(log(ψ)-log(conj(ψ))))# phase of wave
+
+DS(ψ) = sum(diff(unwrap(S(ψ)))) #phase change
 ##system size
 
 L = (40.0,)
@@ -44,6 +57,7 @@ f = sqrt(1-(v/c)^2)
 
 xlims!(-10,10)
 γ = 0.01
+gamma = γ
 Nt=800
 tf = 16*pi/sqrt(2); t = LinRange(ti,tf,Nt)
 dt=diff(t)[1]
@@ -54,6 +68,8 @@ simSoliton = Sim(sim;γ=γ,tf=tf,t=t,ϕi=ϕi)
 ϕf = sols[152]
 ψf = xspace(ϕf,simSoliton)
 ##
+dx= diff(x)[1]
+dt= diff(t)[1]
 K2=k2(K)
 xat = zero(t)#(nearest grid point)
 xnt = zero(t)
@@ -75,6 +91,11 @@ end
 ##
 plot(t[3:end], xat[3:end], label="analytic")
 plot!(t[2:end], xnt[2:end],label ="numerical",xlims=(0,25),ylims=(-5,5))
+##
+gamma = L"\gamma"
+
+##
+savefig("1")
 ##
 anim = @animate for i in 1:length(t)-4 #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
