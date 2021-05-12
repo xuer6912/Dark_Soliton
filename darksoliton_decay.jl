@@ -91,11 +91,14 @@ end
 ##
 plot(t[3:end], xat[3:end], label="analytic")
 plot!(t[2:end], xnt[2:end],label ="numerical",xlims=(0,25),ylims=(-5,5))
+xi=xat[3]
+plot!(t[3:end],xi*exp.(9*γ*t[3:end]))
+plot!(t[3:end],-xi*exp.(9*γ*t[3:end]),legend=:false)
 ##
-gamma = L"\gamma"
+
 
 ##
-savefig("1")
+savefig("gamma=$gamma.png")
 ##
 anim = @animate for i in 1:length(t)-4 #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
