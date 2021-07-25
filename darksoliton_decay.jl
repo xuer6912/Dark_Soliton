@@ -89,11 +89,11 @@ for i in 1:length(t) #make it periodic by ending early
   
 end
 ##
-plot(t[3:end], xat[3:end], label="analytic")
-plot!(t[2:end], xnt[2:end],label ="numerical",xlims=(0,25),ylims=(-5,5))
+plot(t[3:end], xat[3:end], label="analytic",xlims=(0,25),ylims=(-5,5))
+#plot!(t[2:end], xnt[2:end],label ="numerical",xlims=(0,25),ylims=(-5,5))
 xi=xat[3]
-plot!(t[3:end],xi*exp.(9*γ*t[3:end]))
-plot!(t[3:end],-xi*exp.(9*γ*t[3:end]),legend=:false)
+plot!(t[3:end],xi*exp.(μ/3*γ*t[3:end]))
+plot!(t[3:end],-xi*exp.(μ/3*γ*t[3:end]),legend=:false)
 ##
 
 
