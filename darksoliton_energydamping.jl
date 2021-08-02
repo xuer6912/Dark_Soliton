@@ -48,18 +48,21 @@ x = X[1];
 @pack_Sim! sim
 
 ## harmonic
+M = 0.00
 sol = runsim(sim);
+
 ϕg = sol[end]
 ψg = xspace(ϕg,sim)
 ## Soliton
+
 K2=k2(K)
-psi=XField(ψf,X,K,K2)
+#psi=XField(ψf,X,K,K2)
 #jx = diffcurrent(psi)
-import FourierGPE.V
 M = 0.01
-V(x,ψ,kx,t) = 0.5*x^2 - M*diffcurrent(ψ,kx) 
+
 ##
 ψf = xspace(sol[end],sim)
+
 c = sqrt(μ)
 ξ = 1/c
 v = 0#.01*c
@@ -76,9 +79,10 @@ dt=diff(t)[1]
 ϕi = kspace(ψs,sim)
 simSoliton = Sim(sim;γ=γ,tf=tf,t=t,ϕi=ϕi)
 @time sols = runsim(simSoliton);
-
-ϕf = sols[152]
+##
+ϕf = sols[1]
 ψf = xspace(ϕf,simSoliton)
+showpsi(x,ψf)
 ##
 dx= diff(x)[1]
 dt= diff(t)[1]
@@ -101,6 +105,7 @@ for i in 1:length(t) #make it periodic by ending early
   
 end
 ##
+showpsi(x,ψf)
 
 
 ##
@@ -126,3 +131,6 @@ anim = @animate for i in 1:length(t)-4 #make it periodic by ending early
 end
 filename = "decay.gif"
 gif(anim,filename,fps=30)
+
+##
+diffcurrent(ψg,K[1])
