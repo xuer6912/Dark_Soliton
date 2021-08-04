@@ -21,10 +21,6 @@ function velocity2(psi::XField{1})
 end
 
 
-
-##
-
-##
 S(ψ) =  @. real( -im/2*(log(ψ)-log(conj(ψ))))# phase of wave
 
 DS(ψ) = sum(diff(unwrap(S(ψ)))) #phase change
@@ -89,7 +85,7 @@ dt= diff(t)[1]
 
 xat = zero(t)#(nearest grid point)
 xnt = zero(t)
-for i in 1:length(t) #make it periodic by ending early
+for i in 1:8#make it periodic by ending early
     ψ = xspace(sols[i],simSoliton)
     psi=XField(ψ,X,K,K2)
     v=velocity2(psi)
@@ -109,18 +105,20 @@ showpsi(x,ψf)
 
 
 ##
-plot(t[3:end], xat[3:end], label="analytic",xlims=(0,25),ylims=(-5,5))
+plot(t[1:end], xat[1:end], label="analytic",xlims=(0,25),ylims=(-5,5))
+
+##
 #plot!(t[2:end], xnt[2:end],label ="numerical",xlims=(0,25),ylims=(-5,5))
 xi=xat[3]
-plot!(t[3:end],xi*exp.(μ/3*γ*t[3:end]))
-plot!(t[3:end],-xi*exp.(μ/3*γ*t[3:end]),legend=:false)
+#plot!(t[3:end],xi*exp.(μ/3*γ*t[3:end]))
+#plot!(t[3:end],-xi*exp.(μ/3*γ*t[3:end]),legend=:false)
 ##
 
 
 ##
 savefig("gamma=$gamma.png")
 ##
-anim = @animate for i in 1:length(t)-4 #make it periodic by ending early
+anim = @animate for i in 1:8 #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
     ψ = xspace(sols[i],simSoliton)
     y = g*abs2.(ψ)

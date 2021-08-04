@@ -1,7 +1,7 @@
 using FourierGPE, VortexDistributions, FFTW
 ##
 #ϕ = fft(ψ)
-function diffcurrent(ϕ,kx)
+function diffcurrent2(ϕ,kx)
     ψ = ifft(ϕ)
 	ψx = ifft(im*kx.*ϕ)
 	j = @. imag(conj(ψ)*ψx)
@@ -24,7 +24,8 @@ function nlin!(dϕ,ϕ,sim::Sim{1},t)
     @unpack g,X,K,V0 = sim; x = X[1]; kx = K[1]
     dϕ .= ϕ
     xspace!(dϕ,sim)
-    dϕ .*= V0 + V.(x,t) + g*abs2.(dϕ) - M*diffcurrent(dϕ,kx) 
+    Ve = - M*diffcurrent(dϕ,kx)
+    @. dϕ *= V0 + V(x,t) + g*abs2(dϕ) + Ve
     kspace!(dϕ,sim)
     return nothing
 end
