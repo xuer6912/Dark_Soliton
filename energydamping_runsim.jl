@@ -43,5 +43,5 @@ function diffcurrent(ψ,kx)
 	ψx = ifft(im*kx.*ϕ)
 	j = @. imag(conj(ψ)*ψx)
     jx = ifft(im*kx.* fft(j)) # current direvative wrt x
-	return jx
+	return real.(jx)
 end

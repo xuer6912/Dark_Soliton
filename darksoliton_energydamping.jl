@@ -80,6 +80,8 @@ simSoliton = Sim(sim;γ=γ,tf=tf,t=t,ϕi=ϕi)
 ψf = xspace(ϕf,simSoliton)
 showpsi(x,ψf)
 ##
+plot(x,real.(diffcurrent(ψf,kx)))
+##
 dx= diff(x)[1]
 dt= diff(t)[1]
 

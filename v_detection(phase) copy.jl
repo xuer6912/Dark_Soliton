@@ -9,7 +9,13 @@ function showpsi(x,ψ)
     p = plot(p1,p2,layout=(2,1),size=(600,400))
     return p
 end
-
+function velocity2(psi::XField{1})
+	@unpack psiX,K = psi; kx = K[1]; ψ = psiX
+	rho = abs2.(ψ)
+    ψx = gradient(psi::XField{1})
+	vx = @. imag(conj(ψ)*ψx)/rho; @. vx[isnan(vx)] = zero(vx[1])
+	return vx
+end
 ##system size
 
 L = (40.0,)
@@ -93,7 +99,7 @@ psi=XField(ψf,X,K,K2)
 ##
 v=velocity2(psi)
 ##
-vt=zeros(t[1:end-4])
+vt=zero(t[1:end-4])
 anim = @animate for i in 1:length(t)-4 #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
     ψ = xspace(sols[i],simSoliton)
@@ -171,15 +177,9 @@ plot(t[2:end],xt[2:end])
 
 ##
 
-
-
-
-##
 S(ψ) =  @. real( -im/2*(log(ψ)-log(conj(ψ))))
 DS(ψ) = sum(diff(unwrap(S(ψ))))
 ##
-
-
 ΔS=zero(t[1:end])
 for i in 1:length(t) #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
