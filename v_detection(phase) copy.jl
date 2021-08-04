@@ -59,7 +59,6 @@ dt=diff(t)[1]
 #dt = 0.01π/μ
 ϕi = kspace(ψs,sim)
 simSoliton = Sim(sim;γ=γ,tf=tf,t=t,ϕi=ϕi)
-##
 @time sols = runsim(simSoliton);
 ##
 ϕf = sols[152]
