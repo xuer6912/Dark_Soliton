@@ -61,11 +61,13 @@ M = 0.00
 sol = runsim(sim);
 ##
 import FourierGPE.nlin!
+
+M = 0.05
 function nlin!(dϕ,ϕ,sim::Sim{1},t)
     @unpack g,X,K,V0 = sim; x = X[1]; kx = K[1]
     dϕ .= ϕ
     xspace!(dϕ,sim)
-    Ve =  -0.5*diffcurrent(dϕ,kx)
+    Ve =  -M*diffcurrent(dϕ,kx)
     @. dϕ *= V0 + V(x,t) + g*abs2(dϕ) + Ve
     kspace!(dϕ,sim)
     return nothing
@@ -80,11 +82,11 @@ K2=k2(K)
 ψf = xspace(sol[end],sim)
 c = sqrt(μ)
 ξ = 1/c
-v = 0#.01*c
-xs = -0.5
+v = .01*c
+xs = 0
 f = sqrt(1-(v/c)^2)
 ψs = @. ψf*(f*tanh(f*(x-xs)/ξ)+im*v/c)
-γ = 0; M = 0.1
+γ = 0; 
 #gamma = γ
 Nt=800
 tf = 16*pi/sqrt(2); t = LinRange(ti,tf,Nt)
@@ -102,6 +104,27 @@ plot(x,(diffcurrent(ψf,kx)))
 xlims!(-9,9)
 ##
 plot(x,J(ψf,kx))
+##
+anim = @animate for i in 1:length(t) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    plot(x,J(ψ,kx))
+    xlims!(-10,10); ylims!(-15,15)
+    #title!(L"\textrm{local}\; \mu(x)")
+    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+end
+filename = "current.gif"
+gif(anim,filename,fps=30)
+
+
+
+
+
+
+
+
+
+
 
 ##
 dx= diff(x)[1]
