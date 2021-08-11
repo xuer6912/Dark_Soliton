@@ -10,7 +10,20 @@ function showpsi(x,ψ)
     return p
 end
 
+function J(ψ,kx)
+    ϕ= fft(ψ)
+	ψx = ifft(im*kx.*ϕ)
+	j = @. imag(conj(ψ)*ψx)
+    return j
+end
 
+function diffcurrent(ψ,kx)
+    ϕ= fft(ψ)
+	ψx = ifft(im*kx.*ϕ)
+	j = @. imag(conj(ψ)*ψx)
+    jx = ifft(im*kx.* fft(j)) # current direvative wrt x
+	return real.(jx)
+end
 
 function velocity2(psi::XField{1})
 	@unpack psiX,K = psi; kx = K[1]; ψ = psiX
@@ -46,28 +59,32 @@ x = X[1];
 ## harmonic
 M = 0.00
 sol = runsim(sim);
-
-ϕg = sol[end]
-ψg = xspace(ϕg,sim)
+##
+import FourierGPE.nlin!
+function nlin!(dϕ,ϕ,sim::Sim{1},t)
+    @unpack g,X,K,V0 = sim; x = X[1]; kx = K[1]
+    dϕ .= ϕ
+    xspace!(dϕ,sim)
+    Ve =  -0.5*diffcurrent(dϕ,kx)
+    @. dϕ *= V0 + V(x,t) + g*abs2(dϕ) + Ve
+    kspace!(dϕ,sim)
+    return nothing
+end
+##
+#ϕg = sol[end]
+#ψg = xspace(ϕg,sim)
 ## Soliton
-
 K2=k2(K)
 #psi=XField(ψf,X,K,K2)
 #jx = diffcurrent(psi)
-M = 0.01
-
-##
 ψf = xspace(sol[end],sim)
-
 c = sqrt(μ)
 ξ = 1/c
 v = 0#.01*c
 xs = -0.5
 f = sqrt(1-(v/c)^2)
 ψs = @. ψf*(f*tanh(f*(x-xs)/ξ)+im*v/c)
-
-xlims!(-10,10)
-γ = 0
+γ = 0; M = 0.1
 #gamma = γ
 Nt=800
 tf = 16*pi/sqrt(2); t = LinRange(ti,tf,Nt)
@@ -80,15 +97,21 @@ simSoliton = Sim(sim;γ=γ,tf=tf,t=t,ϕi=ϕi)
 ψf = xspace(ϕf,simSoliton)
 showpsi(x,ψf)
 ##
-plot(x,real.(diffcurrent(ψf,kx)))
+kx= K[1]
+plot(x,(diffcurrent(ψf,kx)))
+xlims!(-9,9)
+##
+plot(x,J(ψf,kx))
+
 ##
 dx= diff(x)[1]
 dt= diff(t)[1]
 
 xat = zero(t)#(nearest grid point)
 xnt = zero(t)
-for i in 1:8#make it periodic by ending early
-    ψ = xspace(sols[i],simSoliton)
+K2=k2(K)
+for i in 1:length(t)#make it periodic by ending early
+    ψ = xspace(sols[i],sim)
     psi=XField(ψ,X,K,K2)
     v=velocity2(psi)
     mask = g*abs2.(ψi).>0.1*μ
@@ -102,9 +125,6 @@ for i in 1:8#make it periodic by ending early
     xat[i] = xm[1:end-1]'*dϕ *dx
   
 end
-##
-showpsi(x,ψf)
-
 
 ##
 plot(t[1:end], xat[1:end], label="analytic",xlims=(0,25),ylims=(-5,5))
@@ -120,7 +140,7 @@ xi=xat[3]
 ##
 savefig("gamma=$gamma.png")
 ##
-anim = @animate for i in 1:8 #make it periodic by ending early
+anim = @animate for i in 1:length(t) #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
     ψ = xspace(sols[i],simSoliton)
     y = g*abs2.(ψ)
