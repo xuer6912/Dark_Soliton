@@ -40,7 +40,7 @@ DS(ψ) = sum(diff(unwrap(S(ψ)))) #phase change
 ##system size
 
 L = (40.0,)
-N = (4096,)
+N = (512,)
 sim = Sim(L,N)
 @unpack_Sim sim;
 μ =25.0
@@ -61,6 +61,16 @@ M = 0.00
 sol = runsim(sim);
 ##
 import FourierGPE.nlin!
+M = 0.05
+function nlin!(dϕ,ϕ,sim::Sim{1},t)
+    @unpack g,X,K,V0 = sim; x = X[1]; kx = K[1]
+    dϕ .= ϕ
+    xspace!(dϕ,sim)
+    Ve =  -M*diffcurrent(dϕ,kx)
+    @. dϕ *= V0 + V(x,t) + g*abs2(dϕ) + Ve
+    kspace!(dϕ,sim)
+    return nothing
+end
 
 ##
 #ϕg = sol[end]
@@ -180,13 +190,3 @@ gif(anim,filename,fps=30)
 diffcurrent(ψg,K[1])
 
 
-M = 0.05
-function nlin!(dϕ,ϕ,sim::Sim{1},t)
-    @unpack g,X,K,V0 = sim; x = X[1]; kx = K[1]
-    dϕ .= ϕ
-    xspace!(dϕ,sim)
-    #Ve =  -M*diffcurrent(dϕ,kx)
-    @. dϕ *= V0 + V(x,t) + g*abs2(dϕ) #+ Ve
-    kspace!(dϕ,sim)
-    return nothing
-end
