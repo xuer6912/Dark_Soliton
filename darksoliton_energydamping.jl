@@ -14,7 +14,7 @@ function J(ψ,kx)
     ϕ= fft(ψ)
 	ψx = ifft(im*kx.*ϕ)
 	j = @. imag(conj(ψ)*ψx)
-    return j
+    return real.(j)
 end
 
 function diffcurrent(ψ,kx)
@@ -40,10 +40,10 @@ DS(ψ) = sum(diff(unwrap(S(ψ)))) #phase change
 ##system size
 
 L = (40.0,)
-N = (2048,)
+N = (4096,)
 sim = Sim(L,N)
 @unpack_Sim sim;
-μ = 25.0
+μ =25.0
 
 ## Declaring the potential
 import FourierGPE.V
@@ -62,16 +62,6 @@ sol = runsim(sim);
 ##
 import FourierGPE.nlin!
 
-M = 0.05
-function nlin!(dϕ,ϕ,sim::Sim{1},t)
-    @unpack g,X,K,V0 = sim; x = X[1]; kx = K[1]
-    dϕ .= ϕ
-    xspace!(dϕ,sim)
-    Ve =  -M*diffcurrent(dϕ,kx)
-    @. dϕ *= V0 + V(x,t) + g*abs2(dϕ) + Ve
-    kspace!(dϕ,sim)
-    return nothing
-end
 ##
 #ϕg = sol[end]
 #ψg = xspace(ϕg,sim)
@@ -82,7 +72,7 @@ K2=k2(K)
 ψf = xspace(sol[end],sim)
 c = sqrt(μ)
 ξ = 1/c
-v = .01*c
+v = .1*c
 xs = 0
 f = sqrt(1-(v/c)^2)
 ψs = @. ψf*(f*tanh(f*(x-xs)/ξ)+im*v/c)
@@ -109,13 +99,24 @@ anim = @animate for i in 1:length(t) #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
     ψ = xspace(sols[i],simSoliton)
     plot(x,J(ψ,kx))
-    xlims!(-10,10); ylims!(-15,15)
+    xlims!(-10,10); ylims!(-100,100)
     #title!(L"\textrm{local}\; \mu(x)")
     #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
 end
 filename = "current.gif"
 gif(anim,filename,fps=30)
 
+##
+anim = @animate for i in 1:length(t) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    plot(x,diffcurrent(ψ,kx))
+    xlims!(-10,10); ylims!(-1000,1000)
+    #title!(L"\textrm{local}\; \mu(x)")
+    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+end
+filename = "diffcurrent.gif"
+gif(anim,filename,fps=30)
 
 
 
@@ -177,3 +178,15 @@ gif(anim,filename,fps=30)
 
 ##
 diffcurrent(ψg,K[1])
+
+
+M = 0.05
+function nlin!(dϕ,ϕ,sim::Sim{1},t)
+    @unpack g,X,K,V0 = sim; x = X[1]; kx = K[1]
+    dϕ .= ϕ
+    xspace!(dϕ,sim)
+    #Ve =  -M*diffcurrent(dϕ,kx)
+    @. dϕ *= V0 + V(x,t) + g*abs2(dϕ) #+ Ve
+    kspace!(dϕ,sim)
+    return nothing
+end
