@@ -104,6 +104,9 @@ plot(x,(diffcurrent(ψf,kx)))
 xlims!(-9,9)
 ##
 plot(x,J(ψf,kx))
+
+
+
 ##
 anim = @animate for i in 1:length(t) #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
