@@ -2,7 +2,7 @@ using Plots, FourierGPE, LaTeXStrings,VortexDistributions, FFTW
 gr(fmt="png",legend=true,titlefontsize=12,size=(500,200),grid=false,colorbar=false);
 ## convenient plotting method
 function showpsi(x,ψ)
-    p1 = plot(x,abs2.(ψ))
+    p1 = plot(x,g*abs2.(ψ))
     xlabel!(L"x/a_x");ylabel!(L"|\psi|^2")
     p2 = plot(x,angle.(ψ))
     xlabel!(L"x/a_x");ylabel!(L"\textrm{phase}(\psi)")
@@ -61,7 +61,7 @@ M = 0.00
 sol = runsim(sim);
 ##
 import FourierGPE.nlin!
-M = 0.05
+M = 0.0000
 function nlin!(dϕ,ϕ,sim::Sim{1},t)
     @unpack g,X,K,V0 = sim; x = X[1]; kx = K[1]
     dϕ .= ϕ
@@ -82,14 +82,14 @@ K2=k2(K)
 ψf = xspace(sol[end],sim)
 c = sqrt(μ)
 ξ = 1/c
-v = .1*c
+v = .5*c
 xs = 0
 f = sqrt(1-(v/c)^2)
 ψs = @. ψf*(f*tanh(f*(x-xs)/ξ)+im*v/c)
 γ = 0; 
 #gamma = γ
 Nt=800
-tf = 16*pi/sqrt(2); t = LinRange(ti,tf,Nt)
+tf = 8*pi/sqrt(2); t = LinRange(ti,tf,Nt)
 dt=diff(t)[1]
 ϕi = kspace(ψs,sim)
 simSoliton = Sim(sim;γ=γ,tf=tf,t=t,ϕi=ϕi)
@@ -104,38 +104,6 @@ plot(x,(diffcurrent(ψf,kx)))
 xlims!(-9,9)
 ##
 plot(x,J(ψf,kx))
-##
-anim = @animate for i in 1:length(t) #make it periodic by ending early
-    #ψi = ψ0.(x,μ,g)
-    ψ = xspace(sols[i],simSoliton)
-    plot(x,J(ψ,kx))
-    xlims!(-10,10); ylims!(-100,100)
-    #title!(L"\textrm{local}\; \mu(x)")
-    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
-end
-filename = "current.gif"
-gif(anim,filename,fps=30)
-
-##
-anim = @animate for i in 1:length(t) #make it periodic by ending early
-    #ψi = ψ0.(x,μ,g)
-    ψ = xspace(sols[i],simSoliton)
-    plot(x,diffcurrent(ψ,kx))
-    xlims!(-10,10); ylims!(-1000,1000)
-    #title!(L"\textrm{local}\; \mu(x)")
-    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
-end
-filename = "diffcurrent.gif"
-gif(anim,filename,fps=30)
-
-
-
-
-
-
-
-
-
 
 ##
 dx= diff(x)[1]
@@ -169,24 +137,52 @@ xi=xat[3]
 #plot!(t[3:end],xi*exp.(μ/3*γ*t[3:end]))
 #plot!(t[3:end],-xi*exp.(μ/3*γ*t[3:end]),legend=:false)
 ##
-
-
-##
-savefig("gamma=$gamma.png")
 ##
 anim = @animate for i in 1:length(t) #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
     ψ = xspace(sols[i],simSoliton)
-    y = g*abs2.(ψ)
-    plot(x,y)
-    xlims!(-10,10); ylims!(0,1.3*μ)
-    title!(L"\textrm{local}\; \mu(x)")
-    xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+    showpsi(x,ψ)
+    #plot(x,y)
+    #xlims!(-10,10); ylims!(0,1.3*μ)
+    #title!(L"\textrm{local}\; \mu(x)")
+    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
 end
 filename = "decay.gif"
 gif(anim,filename,fps=30)
 
 ##
 diffcurrent(ψg,K[1])
+
+##
+anim = @animate for i in 1:length(t) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    plot(x,J(ψ,kx))
+    xlims!(-10,10); ylims!(-100,100)
+    #title!(L"\textrm{local}\; \mu(x)")
+    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+end
+filename = "current.gif"
+gif(anim,filename,fps=30)
+
+##
+anim = @animate for i in 1:length(t) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    plot(x,diffcurrent(ψ,kx))
+    xlims!(-10,10); ylims!(-1000,1000)
+    #title!(L"\textrm{local}\; \mu(x)")
+    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+end
+filename = "diffcurrent.gif"
+gif(anim,filename,fps=30)
+
+
+
+
+
+
+
+
 
 

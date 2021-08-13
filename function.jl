@@ -1,5 +1,5 @@
 function showpsi(x,ψ)
-    p1 = plot(x,abs2.(ψ))
+    p1 = plot(x,g*abs2.(ψ))
     xlabel!(L"x/a_x");ylabel!(L"|\psi|^2")
     p2 = plot(x,angle.(ψ))
     xlabel!(L"x/a_x");ylabel!(L"\textrm{phase}(\psi)")
