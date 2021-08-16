@@ -61,7 +61,7 @@ M = 0.00
 sol = runsim(sim);
 ##
 import FourierGPE.nlin!
-M = 0.0000
+M = 0.0001
 function nlin!(dϕ,ϕ,sim::Sim{1},t)
     @unpack g,X,K,V0 = sim; x = X[1]; kx = K[1]
     dϕ .= ϕ
@@ -82,14 +82,14 @@ K2=k2(K)
 ψf = xspace(sol[end],sim)
 c = sqrt(μ)
 ξ = 1/c
-v = .5*c
+v = .05*c
 xs = 0
 f = sqrt(1-(v/c)^2)
 ψs = @. ψf*(f*tanh(f*(x-xs)/ξ)+im*v/c)
 γ = 0; 
 #gamma = γ
 Nt=800
-tf = 8*pi/sqrt(2); t = LinRange(ti,tf,Nt)
+tf = 16*pi/sqrt(2); t = LinRange(ti,tf,Nt)
 dt=diff(t)[1]
 ϕi = kspace(ψs,sim)
 simSoliton = Sim(sim;γ=γ,tf=tf,t=t,ϕi=ϕi)
@@ -130,6 +130,10 @@ end
 
 ##
 plot(t[1:end], xat[1:end], label="analytic",xlims=(0,25),ylims=(-5,5))
+#plot(t,xnt)
+xi=0.9
+plot!(t[3:end],xi*exp.(μ*2/15*M*t[3:end]*60))
+#plot!(t[3:end],-xi*exp.(μ*2/15*M*t[3:end]),legend=:false)
 
 ##
 #plot!(t[2:end], xnt[2:end],label ="numerical",xlims=(0,25),ylims=(-5,5))
