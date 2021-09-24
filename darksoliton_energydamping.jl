@@ -129,15 +129,17 @@ for i in 1:length(t)#make it periodic by ending early
 end
 
 ##
-plot(t[1:end], xat[1:end], label="analytic",xlims=(0,25),ylims=(-5,5))
+plot(t[44:end], xat[44:end], label="analytic",xlims=(0,25),ylims=(-5,5))
 #plot(t,xnt)
-xi=0.9
-plot!(t[3:end],xi*exp.(μ*2/15*M*t[3:end]*60))
+xi=xat[44]
+plot!(t[3:end],xi*exp.(μ*2/15*M*t[3:end]*125*2),legend=false)
+plot!(t[3:end],xi*exp.(μ*2/15*M*t[3:end]*125),legend=false)
+savefig("ED_position")
 #plot!(t[3:end],-xi*exp.(μ*2/15*M*t[3:end]),legend=:false)
 
 ##
 #plot!(t[2:end], xnt[2:end],label ="numerical",xlims=(0,25),ylims=(-5,5))
-xi=xat[3]
+
 #plot!(t[3:end],xi*exp.(μ/3*γ*t[3:end]))
 #plot!(t[3:end],-xi*exp.(μ/3*γ*t[3:end]),legend=:false)
 ##
