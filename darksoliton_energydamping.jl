@@ -14,6 +14,7 @@ function J(ψ,kx)
     ϕ= fft(ψ)
 	ψx = ifft(im*kx.*ϕ)
 	j = @. imag(conj(ψ)*ψx)
+    
     return real.(j)
 end
 
@@ -21,6 +22,7 @@ function diffcurrent(ψ,kx)
     ϕ= fft(ψ)
 	ψx = ifft(im*kx.*ϕ)
 	j = @. imag(conj(ψ)*ψx)
+    
     jx = ifft(im*kx.* fft(j)) # current direvative wrt x
 	return real.(jx)
 end
@@ -61,7 +63,7 @@ M = 0.00
 sol = runsim(sim);
 ##
 import FourierGPE.nlin!
-M = 0.0001
+M = 0.00005
 function nlin!(dϕ,ϕ,sim::Sim{1},t)
     @unpack g,X,K,V0 = sim; x = X[1]; kx = K[1]
     dϕ .= ϕ
@@ -129,10 +131,10 @@ for i in 1:length(t)#make it periodic by ending early
 end
 
 ##
-plot(t[44:end], xat[44:end], label="analytic",xlims=(0,25),ylims=(-5,5))
+plot(t[44:end], xat[44:end], label="analytic",xlims=(0,25))
 #plot(t,xnt)
 xi=xat[44]
-plot!(t[3:end],xi*exp.(μ*2/15*M*t[3:end]*125*2),legend=false)
+plot!(t[3:end],xi*exp.(μ*2/15*M*t[3:end]*125*sqrt(5)),legend=false)
 plot!(t[3:end],xi*exp.(μ*2/15*M*t[3:end]*125),legend=false)
 savefig("ED_position")
 #plot!(t[3:end],-xi*exp.(μ*2/15*M*t[3:end]),legend=:false)
