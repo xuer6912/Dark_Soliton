@@ -63,7 +63,7 @@ M = 0.00
 sol = runsim(sim);
 ##
 import FourierGPE.nlin!
-M = 0.00005
+M = 0.0001
 function nlin!(dϕ,ϕ,sim::Sim{1},t)
     @unpack g,X,K,V0 = sim; x = X[1]; kx = K[1]
     dϕ .= ϕ
@@ -134,8 +134,9 @@ end
 plot(t[44:end], xat[44:end], label="analytic",xlims=(0,25))
 #plot(t,xnt)
 xi=xat[44]
-plot!(t[3:end],xi*exp.(μ*2/15*M*t[3:end]*125*sqrt(5)),legend=false)
-plot!(t[3:end],xi*exp.(μ*2/15*M*t[3:end]*125),legend=false)
+plot!(t[3:end],xi*exp.(μ*2/15*M*t[3:end]*ξ^(-3)*sqrt(5)),legend=false)
+plot!(t[3:end],xi*exp.(μ*2/15*M*t[3:end]*ξ^(-3)),legend=false)
+##
 savefig("ED_position")
 #plot!(t[3:end],-xi*exp.(μ*2/15*M*t[3:end]),legend=:false)
 
