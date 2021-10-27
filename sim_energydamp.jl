@@ -131,13 +131,20 @@ for i in 1:length(t)#make it periodic by ending early
 end
 
 
+
+
+
+
+
+
+
 ##
-plot(t[44:end], xat[44:end], label="analytic",xlims=(0,25),ylims=(-2,2))
+plot(t[1:end], xat[1:end], label="analytic",ylims=(-5,5))
 #plot(t,xnt)
 xi=xat[44]
-plot!(t[3:end],xi*exp.(μ*2/15*M*t[3:end]*125*2),legend=false)
+plot!(t[1:end],xi*exp.(μ*μ/g*2/15*M*t[1:end]),legend=false)
 #plot!(t[3:end],xi*exp.(μ*2/15*M*t[3:end]*125),legend=false)
-plot!(t[3:end],-xi*exp.(μ*2/15*M*t[3:end]*125*2),legend=false)
+plot!(t[1:end],-xi*exp.(μ*μ/g*2/15*M*t[1:end]),legend=false)
 #plot!(t,xnt)
 
 ##
@@ -191,11 +198,32 @@ filename = "diffcurrent.gif"
 gif(anim,filename,fps=30)
 
 
+##
+ts = t[1:100]
+n = zeros(length(t),N[1])
+##
+for i in 1:length(t) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    n[i,:] = abs2.(ψ) 
+    #xlims!(-10,10); ylims!(-1000,1000)
+    #title!(L"\textrm{local}\; \mu(x)")
+    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+end
 
+##
+heatmap(t,x,n')
+ylims!(-5,5)
+xlabel!(L"t/t_0")
+ylabel!(L"x/x_0")
+##
+savefig("xs_ed")
+##
+plot!(t[44:end], xat[44:end], label="analytic",xlims=(0,25),ylims=(-2,2))
+#plot(t,xnt)
+xi=xat[44]
+plot!(t[3:end],xi*exp.(μ*μ/g*2/15*M*t[3:end]),legend=false)
+#plot!(t[3:end],xi*exp.(μ*2/15*M*t[3:end]*125),legend=false)
+plot!(t[3:end],-xi*exp.(μ*μ/g*2/15*M*t[3:end]),legend=false)
 
-
-
-
-
-
-
+savefig("xs_energydamp")

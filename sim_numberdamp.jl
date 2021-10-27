@@ -54,7 +54,15 @@ v = 0#.01*c
 xs = -0.5
 f = sqrt(1-(v/c)^2)
 ψs = @. ψf*(f*tanh(f*(x-xs)/ξ)+im*v/c)
-
+function nlin!(dϕ,ϕ,sim::Sim{1},t)
+    @unpack g,X,K,V0 = sim; x = X[1]; kx = K[1]
+    dϕ .= ϕ
+    xspace!(dϕ,sim)
+    #Ve =  -M*diffcurrent(dϕ,kx)
+    @. dϕ *= V0 + V(x,t) + g*abs2(dϕ) #+ Ve
+    kspace!(dϕ,sim)
+    return nothing
+end
 xlims!(-10,10)
 γ = 0.01
 gamma = γ
@@ -89,14 +97,39 @@ for i in 1:length(t) #make it periodic by ending early
   
 end
 ##
-plot(t[3:end], xat[3:end], label="analytic",xlims=(0,25),ylims=(-5,5))
-plot!(t[2:end], xnt[2:end],label ="numerical",xlims=(0,25),ylims=(-5,5))
-xi=xat[1]
+#plot(t[3:end], xat[3:end], label="analytic",xlims=(0,25),ylims=(-5,5))
+plot(t[2:end], xnt[2:end],label ="numerical",xlims=(0,25),ylims=(-5,5))
+xi=xat[2]
 plot!(t[3:end],xi*exp.(μ/3*γ*t[3:end]))
 plot!(t[3:end],-xi*exp.(μ/3*γ*t[3:end]),legend=:false)
 ##
 
 
+ts = t[1:100]
+n = zeros(length(t),N[1])
+##
+for i in 1:length(t) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    n[i,:] = abs2.(ψ) 
+    #xlims!(-10,10); ylims!(-1000,1000)
+    #title!(L"\textrm{local}\; \mu(x)")
+    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+end
+
+##
+heatmap(t,x,n')
+ylims!(-6,6)
+xlabel!(L"t/t_0")
+ylabel!(L"x/x_0")
+##
+plot!(t[2:end], xnt[2:end],label ="numerical")
+xi=xat[2]
+plot!(t[3:end],xi*exp.(μ/3*γ*t[3:end]))
+plot!(t[3:end],-xi*exp.(μ/3*γ*t[3:end]),legend=:false)
+##
+
+savefig("xs_numberdamp.png")
 ##
 savefig("gamma=$gamma.png")
 ##
