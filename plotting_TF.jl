@@ -37,6 +37,8 @@ xlims!(-10,10); ylims!(0,1.3*μ)
 title!(L"\textrm{local}\; \mu(x)")
 xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
 
+savefig("TF")
+
 ## imprint dark soliton
 ψf = xspace(sol[end],sim)
 c = sqrt(μ)
@@ -77,3 +79,4 @@ anim = @animate for i in 1:length(t)-3
 end
 
 gif(anim,"./examples/soliton.gif",fps=25)
+##

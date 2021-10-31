@@ -65,7 +65,7 @@ function nlin!(dϕ,ϕ,sim::Sim{1},t)
 end
 xlims!(-10,10)
 γ = 0.01
-gamma = γ
+
 Nt=800
 tf = 16*pi/sqrt(2); t = LinRange(ti,tf,Nt)
 dt=diff(t)[1]

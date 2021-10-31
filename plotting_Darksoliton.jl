@@ -88,7 +88,7 @@ xlabel!(L"x/a_x");ylabel!(L"\textrm{phase}(\psi)")
 xlims!(-10,10)
 ylims!(-0.05,3.5)
 p = plot(p1,p2,layout=(2,1),size=(600,400))
-
+savefig("DarkSoliton")
 
 
 ##########
