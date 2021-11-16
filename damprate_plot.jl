@@ -1,23 +1,24 @@
+using Plots,LaTeXStrings
 #physical constant
 amu = 1.66053e-27
 a0 = 5.29e-11 # Bohr radius
 ħ = 1.055e-34
 kB = 1.381e-23
-
+##
 #Rubidium 87
 m = 87*amu 
 a = 95*a0 
 g = 4*π*ħ^2*a/m
-
+##
 #trap
 wz = 2*pi*3
 wr = 2*pi*300
 az = sqrt(ħ/m/wz)
 ar = sqrt(ħ/m/wr)
 g1 = 2*ħ*wr*a 
-
+##
 #temperature
-T = 20e-9
+T = 50e-9
 Tc = 60e-9
 β = 1/(kB*T)
 ϵc(μ) = 3*μ
@@ -53,24 +54,27 @@ begin
 	    return Γ_M
 	end
 end
+##
 
-begin
-	μr = LinRange(.5, 10,100)*μ1
-	p1 = plot(μr/(ħ*wz), Γ_γ.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_\gamma",legend=:topleft)
-	plot!(μr/(ħ*wz) , Γ_M.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_M")
-	#
-	vline!([0.5wr/wz])
-	xlabel!(L"\mu/\hbar\omega_z")
-	ylabel!(L"\Gamma\sqrt{2}/\omega_z")
+μr = LinRange(.5, 10,100)*μ1
+p1 = plot(μr/(ħ*wz), Γ_γ.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_\gamma",legend=:topleft)
+plot!(μr/(ħ*wz) , Γ_M.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_M")
+
+vline!([0.5wr/wz])
+xlabel!(L"\mu/\hbar\omega_z")
+ylabel!(L"\Gamma\sqrt{2}/\omega_z")
+##
+
+
 	##
 	# savefig(L"\Gamma")
-end
+##
 N = 1.21e5
-begin
-	g2d(az) = g/sqrt(2*pi*az^2)
-	μtf(wr,az,a,N) = ħ*wr*sqrt(sqrt(8/pi)*a/az*N)  
-	Rtf(μ,w) = sqrt(2*μ/m/w^2)
-end
+##
+g2d(az) = g/sqrt(2*pi*az^2)
+μtf(wr,az,a,N) = ħ*wr*sqrt(sqrt(8/pi)*a/az*N)  
+Rtf(μ,w) = sqrt(2*μ/m/w^2)
+##
 μ  = μtf(wr,az,a,N)
 n0 = μ/g 
 c = sqrt(μ/m)

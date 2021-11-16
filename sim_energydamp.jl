@@ -227,3 +227,5 @@ plot!(t[3:end],xi*exp.(μ*μ/g*2/15*M*t[3:end]),legend=false)
 plot!(t[3:end],-xi*exp.(μ*μ/g*2/15*M*t[3:end]),legend=false)
 
 savefig("xs_energydamp")
+
+
