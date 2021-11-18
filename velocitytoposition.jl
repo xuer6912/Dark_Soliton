@@ -130,4 +130,12 @@ for i in 1: length(vrange)
 end
 ##
 plot(Xa)
-plot(Xn[1:41])
+plot(vrange[1:45]/c, Xn[1:45],legend = false)
+xlabel!(L"v/c")
+ylabel!(L"x/x_0")
+savefig("xv1")
+
+plot(vrange[1:40]/c, Xn[1:40],legend = false)
+xlabel!(L"v/c")
+ylabel!(L"x/x_0")
+savefig("xv2")
