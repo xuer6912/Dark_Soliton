@@ -282,3 +282,30 @@ title!(L"v=0.3c")
 plot(plot1,plot2,layout = (2,1),size=(600,800))
 
 savefig("nodamping03")
+
+
+
+
+
+
+Ekt =  zeros(length(t))
+Ept = zeros(length(t))
+Eit =  zeros(length(t))
+
+for i in 1:length(t) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    psi=XField(ψ,X,K,K2)
+    Ekt[i] =sum( Energy(psi)[1])*dx
+    Ept[i] = sum( Energy(psi)[2])*dx
+    Eit[i] = sum( Energy(psi)[3])*dx
+    #xlims!(-10,10); ylims!(-1000,1000)
+    #title!(L"\textrm{local}\; \mu(x)")
+    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+end
+
+plot(t,Ekt,label=L"E_k")
+plot!(t,Ept,label=L"E_p")
+plot!(t,Eit,label=L"E_i")
+plot!(t,Ekt+Ept+Eit,label=L"E_{tot}")
+savefig("Energy_t_nd.pdf")

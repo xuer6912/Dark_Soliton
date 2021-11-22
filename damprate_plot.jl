@@ -20,7 +20,7 @@ g1 = 2*ħ*wr*a
 #temperature
 T = 50e-9
 Tc = 60e-9
-β = 1/(kB*T)
+β(T) = 1/(kB*T)
 ϵc(μ) = 3*μ
 μ1 = ħ*wz*10 # entering Thomas-Fermi regime
 λdB(T)=sqrt(2π*ħ^2/(m*kB*T))
@@ -37,8 +37,8 @@ begin
 	function gamma(μ)
 	    gam = 0
 	    for j in 1:1000
-	        Φ = Lerch.(exp.( β * μ - 2*β*ϵc(μ)), j)
-	        gam += exp.(β * μ*(j+1) - 2 * β * ϵc(μ) *j ) * Φ ^ 2
+	        Φ = Lerch.(exp.( β(T) * μ - 2*β(T)*ϵc(μ)), j)
+	        gam += exp.(β(T) * μ*(j+1) - 2 * β(T) * ϵc(μ) *j ) * Φ ^ 2
 	    end
 	    γ = 8*a^2 / λ^2 * gam
 	    return γ
@@ -49,7 +49,7 @@ begin
 	end  
 	
 	function Γ_M(μ)
-	    M1 = (16* pi *a^2/(exp(β*(ϵc(μ)-μ))-1)) / sqrt(8*pi*ar^2)
+	    M1 = (16* pi *a^2/(exp(β(T)*(ϵc(μ)-μ))-1)) / sqrt(8*pi*ar^2)
 	    Γ_M = M1 * (2/15) * μ.^2 /ħ/g1
 	    return Γ_M
 	end
@@ -84,3 +84,77 @@ R = Rtf(μ,wr)
 ξ
 c
 n0 
+
+
+
+
+
+
+T = 30e-9
+ϵc(μ) = 2*μ
+μr = LinRange(.5, 10,100)*μ1
+p1 = plot(μr/(ħ*wz), Γ_γ.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_\gamma",legend=:topleft)
+plot!(μr/(ħ*wz) , Γ_M.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_M",size = (600,300))
+
+vline!([0.5wr/wz],label =L"50\hbar\omega_z")
+xlabel!(L"\mu/\hbar\omega_z")
+ylabel!(L"\Gamma\sqrt{2}/\omega_z")
+
+
+##
+ϵc(μ) = 2.5*μ
+μr = LinRange(.5, 10,100)*μ1
+p2 = plot(μr/(ħ*wz), Γ_γ.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_\gamma",legend=:topleft)
+plot!(μr/(ħ*wz) , Γ_M.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_M",size = (600,300))
+
+vline!([0.5wr/wz],label =L"50\hbar\omega_z")
+xlabel!(L"\mu/\hbar\omega_z")
+ylabel!(L"\Gamma\sqrt{2}/\omega_z")
+
+ϵc(μ) = 3*μ
+μr = LinRange(.5, 10,100)*μ1
+p3 = plot(μr/(ħ*wz), Γ_γ.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_\gamma",legend=:topleft)
+plot!(μr/(ħ*wz) , Γ_M.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_M",size = (600,300))
+
+vline!([0.5wr/wz],label =L"50\hbar\omega_z")
+xlabel!(L"\mu/\hbar\omega_z")
+ylabel!(L"\Gamma\sqrt{2}/\omega_z")
+
+plot(p1,p2,p3,layout=(3,1),size=(600,800))
+savefig("dampratecut")
+
+
+
+#################
+
+ϵc(μ) = 3*μ
+
+T = 12e-9
+μr = LinRange(.5, 10,100)*μ1
+p1 = plot(μr/(ħ*wz), Γ_γ.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_\gamma",legend=:topleft)
+plot!(μr/(ħ*wz) , Γ_M.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_M",size = (600,300))
+
+vline!([0.5wr/wz],label =L"50\hbar\omega_z")
+xlabel!(L"\mu/\hbar\omega_z")
+ylabel!(L"\Gamma\sqrt{2}/\omega_z")
+
+T = 30e-9
+μr = LinRange(.5, 10,100)*μ1
+p2 = plot(μr/(ħ*wz), Γ_γ.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_\gamma",legend=:topleft)
+plot!(μr/(ħ*wz) , Γ_M.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_M",size = (600,300))
+
+vline!([0.5wr/wz],label =L"50\hbar\omega_z")
+xlabel!(L"\mu/\hbar\omega_z")
+ylabel!(L"\Gamma\sqrt{2}/\omega_z")
+
+T = 48e-9
+μr = LinRange(.5, 10,100)*μ1
+p3 = plot(μr/(ħ*wz), Γ_γ.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_\gamma",legend=:topleft)
+plot!(μr/(ħ*wz) , Γ_M.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_M",size = (600,300))
+
+vline!([0.5wr/wz],label =L"50\hbar\omega_z")
+xlabel!(L"\mu/\hbar\omega_z")
+ylabel!(L"\Gamma\sqrt{2}/\omega_z")
+
+plot(p1,p2,p3,layout=(3,1),size=(600,800))
+savefig("damprateT")

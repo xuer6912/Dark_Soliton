@@ -50,8 +50,8 @@ sol = runsim(sim);
 ψf = xspace(sol[end],sim)
 c = sqrt(μ)
 ξ = 1/c
-v = 0#.01*c
-xs = -0.5
+v = .1*c
+xs = 0
 f = sqrt(1-(v/c)^2)
 ψs = @. ψf*(f*tanh(f*(x-xs)/ξ)+im*v/c)
 function nlin!(dϕ,ϕ,sim::Sim{1},t)
@@ -63,7 +63,7 @@ function nlin!(dϕ,ϕ,sim::Sim{1},t)
     kspace!(dϕ,sim)
     return nothing
 end
-xlims!(-10,10)
+
 γ = 0.01
 
 Nt=800
@@ -97,11 +97,11 @@ for i in 1:length(t) #make it periodic by ending early
   
 end
 ##
-#plot(t[3:end], xat[3:end], label="analytic",xlims=(0,25),ylims=(-5,5))
+plot(t[3:end], xat[3:end], label="analytic",xlims=(0,25),ylims=(-5,5))
 plot(t[2:end], xnt[2:end],label ="numerical",xlims=(0,25),ylims=(-5,5))
-xi=xat[2]
-plot!(t[3:end],xi*exp.(μ/3*γ*t[3:end]))
-plot!(t[3:end],-xi*exp.(μ/3*γ*t[3:end]),legend=:false)
+xi=xnt[53]
+plot!(t[53:end],xi*exp.(μ/3*γ*t[53:end]))
+plot!(t[53:end],-xi*exp.(μ/3*γ*t[53:end]),legend=:false)
 ##
 
 
@@ -119,7 +119,7 @@ end
 
 ##
 heatmap(t,x,n')
-ylims!(-6,6)
+#ylims!(-6,6)
 xlabel!(L"t/t_0")
 ylabel!(L"x/x_0")
 ##
@@ -162,6 +162,46 @@ function position_index()
     xm = x[mask]
     xat[i] = xm[1:end-1]'*dϕ *dx
   
-
+end
 
 Es_a(ψ) = 4/3 * abs2.(ψ) * c - xs^2 *abs2.(ψ) * ξ
+
+Ekt =  zeros(length(t))
+Ept = zeros(length(t))
+Eit =  zeros(length(t))
+
+for i in 1:length(t) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    psi=XField(ψ,X,K,K2)
+    Ekt[i] =sum( Energy2(psi)[1])*dx
+    Ept[i] = sum( Energy2(psi)[2])*dx
+    Eit[i] = sum( Energy2(psi)[3])*dx
+    #xlims!(-10,10); ylims!(-1000,1000)
+    #title!(L"\textrm{local}\; \mu(x)")
+    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+end
+
+plot(t,Ekt,label=L"E_k")
+plot(t,Ept,label=L"E_p")
+plot!(t,Eit,label=L"E_i")
+plot!(t,Ekt+Ept+Eit,label=L"E_{tot}")
+savefig("Energy_t_nd.pdf")
+
+
+ϕf = sols[584]
+ψf = xspace(ϕf,simSoliton)
+plot(abs2.(ψf))
+
+psi=XField(ψf,X,K,K2)
+
+Ek , Ep, Ei = Energy(psi)
+
+##
+#plot(Real.(Ek))
+plot(x,Ep,label=L"E_p")
+plot!(x,Ek,label=L"E_k")
+plot!(x,Ei,label=L"E_i")
+xlabel!(L"x/x_0")
+ylabel!(L"E")
+savefig("Energysclice")

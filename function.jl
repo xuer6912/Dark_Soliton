@@ -129,3 +129,68 @@ xlims!(15.1,15.9)
 ##
 
 gr(fmt="png",legend=true,titlefontsize=12,size=(500,200),grid=false,colorbar=false)
+
+########
+function Energy(psi::XField{1})
+	@unpack psiX,K = psi; kx = K[1]; ψ = psiX
+	rho = abs2.(ψ)
+    rhoi = abs2.(ψg)
+    ψx = gradient(psi::XField{1})
+	Ek = 0.5 * abs2.(ψx) 
+    Ep = 0.5 * (x.^2) .* (rho - rhoi)
+    Ei = 0.5 * g * (rho - rhoi).^2
+	return Ek, Ep, Ei
+end
+##
+##
+psi=XField(ψf,X,K,K2)
+
+Ek , Ep, Ei = Energy(psi)
+
+##
+#plot(Real.(Ek))
+
+
+##
+Ekt1 =  zeros(length(t),N[1])
+Ept1 = zeros(length(t),N[1])
+Eit1 =  zeros(length(t),N[1])
+
+for i in 1:length(t) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    psi=XField(ψ,X,K,K2)
+    Ekt1[i,:] , Ept1[i,:], Eit1[i,:] = Energy(psi)
+    #xlims!(-10,10); ylims!(-1000,1000)
+    #title!(L"\textrm{local}\; \mu(x)")
+    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+end
+
+p1 = heatmap(t,x,Ekt1',xlabel=L"t/t_0",ylabel=L"x/x_0",title=L"E_k" )
+#xlabel!(L"t/t_0")
+#ylabel!(L"x/x_0")
+#title!(L"E_k")
+p2 = heatmap(t,x,Ept1',xlabel=L"t/t_0",ylabel=L"x/x_0",title=L"E_p" )
+p3 = heatmap(t,x,Eit1',xlabel=L"t/t_0",ylabel=L"x/x_0",title=L"E_i" )
+p4 = heatmap(t,x,Ekt1'+Ept1'+Eit1',xlabel=L"t/t_0",ylabel=L"x/x_0",title=L"E_{tot}" )
+plot(p1,p2,p3,p4,layout=(4,1),size=(600,800))
+
+savefig("Energydistrobution_n.pdf")
+
+
+function Energy2(psi::XField{1})
+	@unpack psiX,K = psi; kx = K[1]; ψ = psiX
+	rho = abs2.(ψ)
+    rhoi = abs2.(ψg)
+    ψx = gradient(psi::XField{1})
+	Ek = 0.5 * abs2.(ψx) 
+    Ep = 0.5 * (x.^2) .* (rho )
+    Ei = 0.5 * g * (rho- rhoi).^2
+	return Ek, Ep, Ei
+end
+##
+##
+psi=XField(ψf,X,K,K2)
+
+Ek , Ep, Ei = Energy(psi)
+
