@@ -149,20 +149,7 @@ gif(anim,filename,fps=30)
 Es_n(ψ) = sum(abs2.(diff(ψ)))/dx + g/2*sum(abs2.(ψ) - abs2.(ψi))*dx
 
  #make it periodic by ending early
-function position_index()
-    psi=XField(ψ,X,K,K2)
-    v=velocity2(psi)
-    mask = g*abs2.(ψi).>0.1*μ
-    v_mask = v[mask]
-    x_mask = x[mask]
-    xnt[i] = x_mask[findmax(abs.(v_mask))[2]]
-    ΔS = DS(ψ[mask])
-    ϕ =    unwrap(S(ψ[mask]))
-    dϕ = diff(ϕ)/(dx*ΔS)
-    xm = x[mask]
-    xat[i] = xm[1:end-1]'*dϕ *dx
-  
-end
+
 
 Es_a(ψ) = 4/3 * abs2.(ψ) * c - xs^2 *abs2.(ψ) * ξ
 
@@ -174,9 +161,9 @@ for i in 1:length(t) #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
     ψ = xspace(sols[i],simSoliton)
     psi=XField(ψ,X,K,K2)
-    Ekt[i] =sum( Energy2(psi)[1])*dx
-    Ept[i] = sum( Energy2(psi)[2])*dx
-    Eit[i] = sum( Energy2(psi)[3])*dx
+    Ekt[i] =sum( Energy(psi)[1])*dx
+    Ept[i] = sum( Energy(psi)[2])*dx
+    Eit[i] = sum( Energy(psi)[3])*dx
     #xlims!(-10,10); ylims!(-1000,1000)
     #title!(L"\textrm{local}\; \mu(x)")
     #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")

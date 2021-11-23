@@ -10,22 +10,6 @@ function showpsi(x,ψ)
     return p
 end
 
-function J(ψ,kx)
-    ϕ= fft(ψ)
-	ψx = ifft(im*kx.*ϕ)
-	j = @. imag(conj(ψ)*ψx)
-    
-    return real.(j)
-end
-
-function diffcurrent(ψ,kx)
-    ϕ= fft(ψ)
-	ψx = ifft(im*kx.*ϕ)
-	j = @. imag(conj(ψ)*ψx)
-    
-    jx = ifft(im*kx.* fft(j)) # current direvative wrt x
-	return real.(jx)
-end
 
 function velocity2(psi::XField{1})
 	@unpack psiX,K = psi; kx = K[1]; ψ = psiX
@@ -102,10 +86,10 @@ simSoliton = Sim(sim;γ=γ,tf=tf,t=t,ϕi=ϕi)
 showpsi(x,ψf)
 ##
 kx= K[1]
-plot(x,(diffcurrent(ψf,kx)))
-xlims!(-9,9)
+#plot(x,(diffcurrent(ψf,kx)))
+#xlims!(-9,9)
 ##
-plot(x,J(ψf,kx))
+#plot(x,J(ψf,kx))
 
 ##
 dx= diff(x)[1]
@@ -129,73 +113,6 @@ for i in 1:length(t)#make it periodic by ending early
     xat[i] = xm[1:end-1]'*dϕ *dx
   
 end
-
-
-
-
-
-
-
-
-
-##
-plot(t[1:end], xat[1:end], label="analytic",ylims=(-5,5))
-plot!(t,xnt)
-xi=xat[44]
-plot!(t[44:end],xi*exp.(μ*μ/g*2/15*M*t[44:end]),legend=false)
-#plot!(t[3:end],xi*exp.(μ*2/15*M*t[3:end]*125),legend=false)
-plot!(t[44:end],-xi*exp.(μ*μ/g*2/15*M*t[44:end]),legend=false)
-#plot!(t,xnt)
-
-##
-savefig("ED_position_$M.png")
-#plot!(t[3:end],-xi*exp.(μ*2/15*M*t[3:end]),legend=:false)
-
-##
-#plot!(t[2:end], xnt[2:end],label ="numerical",xlims=(0,25),ylims=(-5,5))
-
-#plot!(t[3:end],xi*exp.(μ/3*γ*t[3:end]))
-#plot!(t[3:end],-xi*exp.(μ/3*γ*t[3:end]),legend=:false)
-##
-##
-anim = @animate for i in 1:length(t) #make it periodic by ending early
-    #ψi = ψ0.(x,μ,g)
-    ψ = xspace(sols[i],simSoliton)
-    showpsi(x,ψ)
-    #plot(x,y)
-    #xlims!(-10,10); ylims!(0,1.3*μ)
-    #title!(L"\textrm{local}\; \mu(x)")
-    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
-end
-filename = "decay.gif"
-gif(anim,filename,fps=30)
-
-##
-diffcurrent(ψg,K[1])
-
-##
-anim = @animate for i in 1:length(t) #make it periodic by ending early
-    #ψi = ψ0.(x,μ,g)
-    ψ = xspace(sols[i],simSoliton)
-    plot(x,J(ψ,kx))
-    xlims!(-10,10); ylims!(-100,100)
-    #title!(L"\textrm{local}\; \mu(x)")
-    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
-end
-filename = "current.gif"
-gif(anim,filename,fps=30)
-
-##
-anim = @animate for i in 1:length(t) #make it periodic by ending early
-    #ψi = ψ0.(x,μ,g)
-    ψ = xspace(sols[i],simSoliton)
-    plot(x,diffcurrent(ψ,kx))
-    xlims!(-10,10); ylims!(-1000,1000)
-    #title!(L"\textrm{local}\; \mu(x)")
-    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
-end
-filename = "diffcurrent.gif"
-gif(anim,filename,fps=30)
 
 
 ##
@@ -227,39 +144,65 @@ plot!(t[44:end],xi*exp.(μ*μ/g*2/15*M*t[44:end]),legend=false)
 plot!(t[44:end],-xi*exp.(μ*μ/g*2/15*M*t[44:end]),legend=false)
 
 savefig("xs_energydamp")
-
-Ekt =  zeros(length(t))
-Ept = zeros(length(t))
-Eit =  zeros(length(t))
-
-for i in 1:length(t) #make it periodic by ending early
+ts= t
+Ekt =  zeros(length(ts))
+Ept = zeros(length(ts))
+Eit =  zeros(length(ts))
+N =  zeros(length(ts))
+for i in 1:length(ts) #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
     ψ = xspace(sols[i],simSoliton)
     psi=XField(ψ,X,K,K2)
-    mask = g*abs2.(ψi).>0.1*μ
+    #mask = g*abs2.(ψi).>0.1*μ
     Ekt[i] =sum( Energy(psi)[1])*dx
     Ept[i] = sum( Energy(psi)[2])*dx
     Eit[i] = sum( Energy(psi)[3])*dx
+    
     #xlims!(-10,10); ylims!(-1000,1000)
     #title!(L"\textrm{local}\; \mu(x)")
     #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
 end
 
-plot(t,Ekt,label=L"E_k")
-plot!(t,Ept,label=L"E_p")
-plot!(t,Eit,label=L"E_i")
-plot!(t,Ekt+Ept+Eit,label=L"E_{tot}")
+plot(ts,Ekt+Eit,label=L"E_{ki}")
+plot(ts,Ept,label=L"E_p")
+plot(ts,Ekt+Ept+Eit,label=L"E_{tot}")
+
 savefig("Energy_t_nd.pdf")
 
-for i in 1:length(t) #make it periodic by ending early
+for i in 1:length(ts) #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
     ψ = xspace(sols[i],simSoliton)
-    psi=XField(ψ,X,K,K2)
-    mask = g*abs2.(ψi).>0.2*μ
-    PE =  Energy(psi)[2]
-    Ept[i] = sum( PE[mask])*dx
+    N[i] = sum(abs2.(ψ)-abs2.(ψg))*dx
     #xlims!(-10,10); ylims!(-1000,1000)
     #title!(L"\textrm{local}\; \mu(x)")
     #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
 end
 
+plot(N)
+
+R=sqrt(2*μ)
+E(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*c*(1-v.^2/c^2).^(3/2)-2*v*μ/g*(1-x.^2/R^2)*ξ*c*(1-v.^2/c^2).^(1/2)
+Eki(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*c*(1-v.^2/c^2).^(3/2)
+Ep(x,v) = -x.^2*μ/g*(1-x.^2/R^2)*ξ*c*(1-v.^2/c^2).^(1/2)
+ΓM = μ*μ/g*2/15*M
+ωs = 1/sqrt(2)
+xt = 0.084*exp.(ΓM*t) .* sin.(sqrt(ωs^2-ΓM^2)*t)
+vt = 0.084*ΓM*exp.(ΓM*t) .* sin.(sqrt(ωs^2-ΓM^2)*t) + 0.084*sqrt(ωs^2-ΓM^2)*exp.(ΓM*t) .* cos.(sqrt(ωs^2-ΓM^2)*t)
+plot(t,xt)
+plot!(t,xnt)
+
+
+plot(t,vt)
+ind = 400
+plot(t[1:ind],E.(xt[1:ind],vt[1:ind]))
+plot(ts[1:ind],Ekt[1:ind]+Eit[1:ind],label=L"E_{ki}")
+plot!(t[1:ind],Eki.(xt[1:ind],vt[1:ind]))
+plot(ts[1:ind],Ept[1:ind],label=L"E_p")
+plot!(t[1:ind],Ep.(xt[1:ind],vt[1:ind]))
+
+
+C(x) = sqrt(μ*(1-x.^2/R^2))
+
+E(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*C.(x) *(1-v.^2 ./C.(x)^2).^(3/2)-2*v*μ/g*(1-x.^2/R^2)*ξ*C.(x)*(1-v.^2 ./C.(x)^2).^(1/2)
+Eki(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*C.(x)*(1-v.^2 ./C.(x)^2).^(3/2)
+Ep(x,v) = -x.^2*μ/g*(1-x.^2/R^2)*ξ .*C.(x)*(1-v.^2 ./C.(x)^2).^(1/2)
