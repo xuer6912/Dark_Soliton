@@ -10,6 +10,24 @@ end
 
 
 
+function velocity2(psi::XField{1})
+	@unpack psiX,K = psi; kx = K[1]; ψ = psiX
+	rho = abs2.(ψ)
+    ψx = gradient(psi::XField{1})
+	vx = @. imag(conj(ψ)*ψx)/rho; @. vx[isnan(vx)] = zero(vx[1])
+	return vx
+end
+
+function diffcurrent(ψ,kx)
+    ϕ= fft(ψ)
+	ψx = ifft(im*kx.*ϕ)
+	j = @. imag(conj(ψ)*ψx)
+    
+    jx = ifft(im*kx.* fft(j)) # current direvative wrt x
+	return real.(jx)
+end
+
+
 ff(v)=sqrt(1-v^2/c^2)
 momentum_exp(ψ) = im/2.0*(-ψ[1:end-1]'*diff(ψ) + diff(ψ)'*ψ[1:end-1])
 
@@ -91,17 +109,92 @@ function Energy(psi::XField{1})
 	@unpack psiX,K = psi; kx = K[1]; ψ = psiX
 	rho = abs2.(ψ)
     rhoi = abs2.(ψg)
+    psig=XField(ψg,X,K,K2)
     ψx = gradient(psi::XField{1})
-	Ek = 0.5 * abs2.(ψx) 
+    ψgx = gradient(psig::XField{1})
+	Ek = 0.5 * abs2.(ψx) - 0.5 * abs2.(ψgx) 
     Ep = 0.5 * (x.^2) .* (rho - rhoi)
     Ei = 0.5 * g * (rho - rhoi).^2
+    Eki = Ek+Ei
+	return Eki, Ep
+end
+
+S(ψ) =  @. real( -im/2*(log(ψ)-log(conj(ψ))))# phase of wave
+
+DS(ψ) = sum(diff(unwrap(S(ψ)))) #phase change
+##
+##
+
+#E(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*c*(1-v.^2/c^2).^(3/2)-2*v*μ/g*(1-x.^2/R^2)*ξ*c*(1-v.^2/c^2).^(1/2)
+#Eki(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*c*(1-v.^2/c^2).^(3/2)
+#Ep(x,v) = -x.^2*μ/g*(1-x.^2/R^2)*ξ*c*(1-v.^2/c^2).^(1/2)
+xat(ΓM,t) = vi*sqrt(2)*exp.(ΓM*t) .* sin.(sqrt(ωs^2-ΓM^2)*t)
+vat(ΓM,t) = vi*sqrt(2)*ΓM*exp.(ΓM*t) .* sin.(sqrt(ωs^2-ΓM^2)*t) + vi*sqrt(2)*sqrt(ωs^2-ΓM^2)*exp.(ΓM*t) .* cos.(sqrt(ωs^2-ΓM^2)*t)
+C(x) = sqrt(μ*(1-x.^2/R^2))
+#E(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*C.(x) *(1-v.^2 ./C.(x)^2).^(3/2)-x.^2*μ/g*(1-x.^2/R^2)*ξ*C.(x)*(1-v.^2 ./C.(x)^2).^(1/2)
+Eki(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*C.(x)*(1-v.^2 ./C.(x)^2).^(3/2)
+Ep(x,v) = -x.^2*μ/g*(1-x.^2/R^2)*ξ *(1-v.^2 ./C.(x)^2).^(1/2)
+E(x,v) = Eki(x,v)+ Ep(x,v)
+
+function solitondynamics(sols,sim,t)
+    ts=t
+    xft = zero(t)#(nearest grid point)
+    xnt = zero(t)
+    Ekit =  zeros(length(ts))
+    Ept = zeros(length(ts))
+    #Eit =  zeros(length(ts))
+    Ns =  zeros(length(ts))
+    for i in 1:length(t)
+        ψ = xspace(sols[i],sim)
+        psi=XField(ψ,X,K,K2)
+        mask = g*abs2.(ψi).>0.05*μ
+        ΔS = DS(ψ[mask])
+        ϕ =    unwrap(S(ψ[mask]))
+        dϕ = diff(ϕ)/(dx*ΔS)
+        v=velocity2(psi)
+        vm = v[mask]
+        xm = x[mask]
+        xnt[i] = xm[findmax(abs.(vm))[2]]
+        xft[i] = xm[1:end-1]'*dϕ *dx
+        Ekit[i] =sum( Energy(psi)[1])*dx
+        Ept[i] = sum( Energy(psi)[2])*dx
+        #Eit[i] = sum( Energy(psi)[3])*dx
+        Ns[i] = sum(abs2.(ψ)-abs2.(ψg))*dx
+    end
+    return xnt,xft,Ekit,Ept,Ns
+end
+
+
+function Energy2(psi::XField{1})
+	@unpack psiX,K = psi; kx = K[1]; ψ = psiX
+	rho = abs2.(ψ)
+    #rhoi = abs2.(ψg)
+    #psig=XField(ψg,X,K,K2)
+    ψx = gradient(psi::XField{1})
+    #ψgx = gradient(psig::XField{1})
+	Ek = 0.5 * abs2.(ψx) #- 0.5 * abs2.(ψgx) 
+    Ep = 0.5 * (x.^2) .* (rho )
+    Ei = 0.5 * g * rho .^2
 	return Ek, Ep, Ei
 end
-##
-C(x) = sqrt(μ*(1-x.^2/R^2))
-
-E(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*C.(x) *(1-v.^2 ./C.(x)^2).^(3/2)-2*v*μ/g*(1-x.^2/R^2)*ξ*C.(x)*(1-v.^2 ./C.(x)^2).^(1/2)
-Eki(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*C.(x)*(1-v.^2 ./C.(x)^2).^(3/2)
-Ep(x,v) = -2*v*μ/g*(1-x.^2/R^2)*ξ .*C.(x)*(1-v.^2 ./C.(x)^2).^(1/2)
 
 
+function solitondynamics2(sols,sim,t)
+    ts=t
+    Ekt =  zeros(length(ts))
+    Ept = zeros(length(ts))
+    Eit =  zeros(length(ts))
+    dJt = zeros(length(ts))
+    #Eit =  zeros(length(ts))
+    #Ns =  zeros(length(ts))
+    for i in 1:length(t)
+        ψ = xspace(sols[i],sim)
+        psi=XField(ψ,X,K,K2)
+        Ekt[i] =sum( Energy2(psi)[1])*dx
+        Ept[i] = sum( Energy2(psi)[2])*dx
+        Eit[i] = sum( Energy2(psi)[3])*dx
+        dJt[i] = sum(diffcurrent(ψ,kx).^2)*dx
+    end
+    ET = Ekt+Ept+Eit
+    return ET,dJt
+end

@@ -19,6 +19,15 @@ function velocity2(psi::XField{1})
 	return vx
 end
 
+function diffcurrent(ψ,kx)
+    ϕ= fft(ψ)
+	ψx = ifft(im*kx.*ϕ)
+	j = @. imag(conj(ψ)*ψx)
+    
+    jx = ifft(im*kx.* fft(j)) # current direvative wrt x
+	return real.(jx)
+end
+
 
 S(ψ) =  @. real( -im/2*(log(ψ)-log(conj(ψ))))# phase of wave
 
@@ -95,8 +104,8 @@ kx= K[1]
 dx= diff(x)[1]
 dt= diff(t)[1]
 
-xat = zero(t)#(nearest grid point)
-xnt = zero(t)
+xa = zero(t)#(nearest grid point)
+xn = zero(t)
 K2=k2(K)
 for i in 1:length(t)#make it periodic by ending early
     ψ = xspace(sols[i],sim)
@@ -105,12 +114,12 @@ for i in 1:length(t)#make it periodic by ending early
     mask = g*abs2.(ψi).>0.1*μ
     v_mask = v[mask]
     x_mask = x[mask]
-    xnt[i] = x_mask[findmax(abs.(v_mask))[2]]
+    xn[i] = x_mask[findmax(abs.(v_mask))[2]]
     ΔS = DS(ψ[mask])
     ϕ =    unwrap(S(ψ[mask]))
     dϕ = diff(ϕ)/(dx*ΔS)
     xm = x[mask]
-    xat[i] = xm[1:end-1]'*dϕ *dx
+    xa[i] = xm[1:end-1]'*dϕ *dx
   
 end
 
@@ -136,7 +145,7 @@ ylabel!(L"x/x_0")
 ##
 savefig("xs_ed")
 ##
-plot!(t[44:end], xat[44:end], label="analytic",xlims=(0,25),ylims=(-2,2))
+plot(t[44:end], xa[44:end], label="analytic",xlims=(0,25),ylims=(-2,2))
 #plot(t,xnt)
 xi=xat[44]
 plot!(t[44:end],xi*exp.(μ*μ/g*2/15*M*t[44:end]),legend=false)
@@ -187,8 +196,10 @@ Ep(x,v) = -x.^2*μ/g*(1-x.^2/R^2)*ξ*c*(1-v.^2/c^2).^(1/2)
 ΓM = μ*μ/g*2/15*M
 ωs = 1/sqrt(2)
 xt = 0.084*exp.(ΓM*t) .* sin.(sqrt(ωs^2-ΓM^2)*t)
+xt2 = 0.01*c*sqrt(2)*exp.(ΓM*t) .* sin.(sqrt(ωs^2-ΓM^2)*t)
 vt = 0.084*ΓM*exp.(ΓM*t) .* sin.(sqrt(ωs^2-ΓM^2)*t) + 0.084*sqrt(ωs^2-ΓM^2)*exp.(ΓM*t) .* cos.(sqrt(ωs^2-ΓM^2)*t)
-plot(t,xt)
+#plot(t,xt)
+plot(t,xt2)
 plot!(t,xnt)
 
 
@@ -206,3 +217,7 @@ C(x) = sqrt(μ*(1-x.^2/R^2))
 E(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*C.(x) *(1-v.^2 ./C.(x)^2).^(3/2)-2*v*μ/g*(1-x.^2/R^2)*ξ*C.(x)*(1-v.^2 ./C.(x)^2).^(1/2)
 Eki(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*C.(x)*(1-v.^2 ./C.(x)^2).^(3/2)
 Ep(x,v) = -x.^2*μ/g*(1-x.^2/R^2)*ξ .*C.(x)*(1-v.^2 ./C.(x)^2).^(1/2)
+
+plot(x,diffcurrent(ψf,kx))
+
+plot(x,J(ψf,kx))

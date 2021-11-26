@@ -66,4 +66,46 @@ savefig("Energydistrobution_n.pdf")
 C(x) = sqrt(μ*(1-x.^2/R^2))
 E(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*C.(x) *(1-v.^2 ./C.(x)^2).^(3/2)-2*v*μ/g*(1-x.^2/R^2)*ξ*C.(x)*(1-v.^2 ./C.(x)^2).^(1/2)
 Eki(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*C.(x)*(1-v.^2 ./C.(x)^2).^(3/2)
-Ep(x,v) = -2*v*μ/g*(1-x.^2/R^2)*ξ .*C.(x)*(1-v.^2 ./C.(x)^2).^(1/2)
+#Ep(x,v) = -2*v*μ/g*(1-x.^2/R^2)*ξ .*C.(x)*(1-v.^2 ./C.(x)^2).^(1/2)
+
+
+for i in 1:length(t)#make it periodic by ending early
+    ψ = xspace(sols[i],sim)
+    psi=XField(ψ,X,K,K2)
+    v=velocity2(psi)
+    mask = g*abs2.(ψi).>0.1*μ
+    v_mask = v[mask]
+    x_mask = x[mask]
+    xnt[i] = x_mask[findmax(abs.(v_mask))[2]]
+    ΔS = DS(ψ[mask])
+    ϕ =    unwrap(S(ψ[mask]))
+    dϕ = diff(ϕ)/(dx*ΔS)
+    xm = x[mask]
+    xat[i] = xm[1:end-1]'*dϕ *dx
+  
+end
+
+
+n = zeros(length(t),N[1])
+##
+for i in 1:length(t) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    n[i,:] = abs2.(ψ) 
+    #xlims!(-10,10); ylims!(-1000,1000)
+    #title!(L"\textrm{local}\; \mu(x)")
+    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+end
+
+##
+heatmap(t,x,n')
+ylims!(-5,5)
+xlabel!(L"t/t_0")
+ylabel!(L"x/x_0")
+##
+savefig("xs_ed")
+##
+plot(t, xat, label="analytic",xlims=(0,25),ylims=(-2,2))
+#plot(t,xnt)
+
+#plot!(t[44:end],xi*exp.(μ*μ/g*2/15*M*t[44:end]),legend=false)
