@@ -131,11 +131,13 @@ end
 ##
 plot(Xa)
 plot(vrange[1:45]/c, Xn[1:45],legend = false)
+plot!(vrange[1:45]/c,vrange[1:45]*sqrt(2))
 xlabel!(L"v/c")
 ylabel!(L"x/x_0")
 savefig("xv1")
 
 plot(vrange[1:40]/c, Xn[1:40],legend = false)
+plot!(vrange[1:45]/c,vrange[1:45]*sqrt(2))
 xlabel!(L"v/c")
 ylabel!(L"x/x_0")
 savefig("xv2")
