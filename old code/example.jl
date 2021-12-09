@@ -109,3 +109,43 @@ plot(t, xat, label="analytic",xlims=(0,25),ylims=(-2,2))
 #plot(t,xnt)
 
 #plot!(t[44:end],xi*exp.(μ*μ/g*2/15*M*t[44:end]),legend=false)
+
+
+ψ = xspace(sols[20],sim)
+psi=XField(ψ,X,K,K2)
+mask = g*abs2.(ψi).>0.1*μ
+v=velocity2(psi)
+mask2 = zero.(x)
+mask2[256-50:256+50] .= 1
+plot(v)
+vm = v[mask]
+plot(vm)
+
+
+function solitondynamics(sols,sim,t)
+    ts=t
+    xft = zero(t)#(nearest grid point)
+    xnt = zero(t)
+    Ekit =  zeros(length(ts))
+    Ept = zeros(length(ts))
+    #Eit =  zeros(length(ts))
+    Ns =  zeros(length(ts))
+    for i in 1:length(t)
+        ψ = xspace(sols[i],sim)
+        psi=XField(ψ,X,K,K2)
+        mask = g*abs2.(ψi).>0.1*μ
+        ΔS = DS(ψ[mask])
+        ϕ =    unwrap(S(ψ[mask]))
+        dϕ = diff(ϕ)/(dx*ΔS)
+        v=velocity2(psi)
+        vm = v[mask]
+        xm = x[mask]
+        xnt[i] = xm[findmax(abs.(vm))[2]]
+        xft[i] = xm[1:end-1]'*dϕ *dx
+        Ekit[i] =sum( Energy(psi)[1])*dx
+        Ept[i] = sum( Energy(psi)[2])*dx
+        #Eit[i] = sum( Energy(psi)[3])*dx
+        Ns[i] = sum(abs2.(ψ)-abs2.(ψg))*dx
+    end
+    return xnt,xft,Ekit,Ept,Ns
+end

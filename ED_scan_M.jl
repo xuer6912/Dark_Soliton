@@ -93,14 +93,16 @@ simSoliton = Sim(sim,γ = γ,tf=tf,t=t,ϕi=ϕi)
 
 
 
+
+
 #plot(xnt)
 Ms = [0.0001,0.00015,0.0002]
 ΓMs = μ*μ/g*2/15 .*Ms
 ##
 ts = t[1:300]
-xnt,xft,Ekit,Ept,Ns = solitondynamics(sols,sim,ts)
-xnt2,xft2,Ekit2,Ept2,Ns2 = solitondynamics(sols2,sim,ts)
-xnt3,xft3,Ekit3,Ept3,Ns3 = solitondynamics(sols3,sim,ts)
+xnt,Ekit,Ept,Ns = solitondynamics(sols,sim,ts)
+xnt2,Ekit2,Ept2,Ns2 = solitondynamics(sols2,sim,ts)
+xnt3,Ekit3,Ept3,Ns3 = solitondynamics(sols3,sim,ts)
 
 
 p1 = plot(ts,xnt,legend=:bottomright,label=L"x_n")
@@ -109,7 +111,7 @@ plot!(ts,vi*sqrt(2)*exp.(ΓMs[1]*ts),label=L"e^{\Gamma t}")
 xlabel!(L"t/t_0")
 ylabel!(L"x/x_0")
 ylims!(-R,R)
-hline!([R/2],label=L"R/2")
+#hline!([R/2],label=L"R/2")
 title!(L"M = 0.0001")
 
 
@@ -121,7 +123,7 @@ plot!(ts,vi*sqrt(2)*exp.(ΓMs[2]*ts),label=L"e^{\Gamma t}")
 xlabel!(L"t/t_0")
 ylabel!(L"x/x_0")
 ylims!(-R,R)
-hline!([R/2],label=L"R/2")
+#hline!([R/2],label=L"R/2")
 title!(L"M = 0.00015")
 
 
@@ -131,7 +133,7 @@ plot!(ts,vi*sqrt(2)*exp.(ΓMs[3]*ts),label=L"e^{\Gamma t}")
 xlabel!(L"t/t_0")
 ylabel!(L"x/x_0")
 ylims!(-R,R)
-hline!([R/2],label=L"R/2")
+#hline!([R/2],label=L"R/2")
 title!(L"M = 0.0002")
 #plot!(t,xt2)
 

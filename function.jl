@@ -136,34 +136,41 @@ Eki(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*C.(x)*(1-v.^2 ./C.(x)^2).^(3/2)
 Ep(x,v) = -x.^2*μ/g*(1-x.^2/R^2)*ξ *(1-v.^2 ./C.(x)^2).^(1/2)
 E(x,v) = Eki(x,v)+ Ep(x,v)
 
-function solitondynamics(sols,sim,t)
-    ts=t
-    xft = zero(t)#(nearest grid point)
-    xnt = zero(t)
-    Ekit =  zeros(length(ts))
-    Ept = zeros(length(ts))
-    #Eit =  zeros(length(ts))
-    Ns =  zeros(length(ts))
-    for i in 1:length(t)
-        ψ = xspace(sols[i],sim)
-        psi=XField(ψ,X,K,K2)
-        mask = g*abs2.(ψi).>0.05*μ
-        ΔS = DS(ψ[mask])
-        ϕ =    unwrap(S(ψ[mask]))
-        dϕ = diff(ϕ)/(dx*ΔS)
-        v=velocity2(psi)
-        vm = v[mask]
-        xm = x[mask]
-        xnt[i] = xm[findmax(abs.(vm))[2]]
-        xft[i] = xm[1:end-1]'*dϕ *dx
-        Ekit[i] =sum( Energy(psi)[1])*dx
-        Ept[i] = sum( Energy(psi)[2])*dx
-        #Eit[i] = sum( Energy(psi)[3])*dx
-        Ns[i] = sum(abs2.(ψ)-abs2.(ψg))*dx
-    end
-    return xnt,xft,Ekit,Ept,Ns
-end
 
+function solitondynamics(sols,sim,t)
+ts=t
+#xft = zero(t)#(nearest grid point)
+xnt = zero(t)
+xt2 = zero(t)
+Ekit =  zeros(length(ts))
+Ept = zeros(length(ts))
+#Eit =  zeros(length(ts))
+Ns =  zeros(length(ts))
+for i in 1:length(t)
+    ψ = xspace(sols[i],sim)
+    psi=XField(ψ,X,K,K2)
+    mask = g*abs2.(ψi).>0.1*μ
+    v=velocity2(psi)
+    vm = v[mask]
+    xm = x[mask]
+    xnt[i] = xm[findmax(abs.(vm))[2]]
+    if i == 1
+        xt2[i] = xnt[1]
+    else
+        j = findall(a->a==xt2[i-1],x)[1] 
+        mask2 = zero.(ψ)
+        mask2[j-2:j+2] .= 1
+        xt2[i] = xm[findmax(abs.(vm .* mask2[mask]))[2]]
+    end
+
+    #xnt2[i] = xm[findmin(abs2.(ψm))[2]]
+    Ekit[i] =sum( Energy(psi)[1])*dx
+    Ept[i] = sum( Energy(psi)[2])*dx
+    #Eit[i] = sum( Energy(psi)[3])*dx
+    Ns[i] = sum(abs2.(ψ)-abs2.(ψg))*dx
+end
+    return xt2,Ekit,Ept,Ns
+end
 
 function Energy2(psi::XField{1})
 	@unpack psiX,K = psi; kx = K[1]; ψ = psiX

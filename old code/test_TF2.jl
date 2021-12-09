@@ -46,11 +46,14 @@ c = sqrt(μ)
 v = 0.5*c
 xs = 0.
 f = sqrt(1-(v/c)^2)
-
-ψs = ψf.*(f*tanh.(f*(x .-xs)/ξ).+im*v/c);
-showpsi(x,ψs)
+R=sqrt(2*μ)
+#ψs = ψf.*(f*tanh.(f*(x .-xs)/ξ).+im*v/c);
+#showpsi(x,ψs)
+edge(R) = (tanh.(-f*(x .-R .-ξ)/ξ/5) .+1) .*(tanh.(f*(x .+R .+ξ)/ξ/5) .+1)/4
+plot(edge(R))
+plot(x,g*edge(R) .* abs2.(ψi))
+plot!(x,g*abs2.(ψg),size=(600,400))
 xlims!(-10,10)
-
 ######
 
 
