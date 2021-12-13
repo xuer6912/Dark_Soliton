@@ -1,5 +1,5 @@
 using Plots, FourierGPE, LaTeXStrings,VortexDistributions, FFTW
-gr(fmt="png",legend=true,titlefontsize=12,size=(500,200),grid=false,colorbar=false);
+gr(fmt="pdf",legend=true,display = true,titlefontsize=12,size=(500,200),grid=false,colorbar=false);
 ## convenient plotting method
 
 
