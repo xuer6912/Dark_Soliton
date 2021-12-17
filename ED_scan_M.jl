@@ -238,6 +238,13 @@ savefig("Energy_ana.pdf")
 ######compare E
 
 
+plot(x,sech.(x).^2*1/2,label=L"\textrm{sech}(x/l)^2")
+plot!(x,sech.(x).^4*3/4,label=L"\textrm{sech}(x/l)^4")
+plot!(x,sech.(x).^6*15/16,label=L"\textrm{sech}(x/l)^6",size=(600,600))
+xlims!(-10,10)
+xlabel!(L"x(x_0)")
+ylabel!(L"\textrm{sech}^{2n}/x_0")
+savefig("sech.pdf")
 #ylims!(-R,R)
 
 

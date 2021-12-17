@@ -27,7 +27,13 @@ function diffcurrent(ψ,kx)
 	return real.(jx)
 end
 
-
+function current(ψ,kx)
+    ϕ= fft(ψ)
+	ψx = ifft(im*kx.*ϕ)
+	j = @. imag(conj(ψ)*ψx)
+     # current direvative wrt x
+	return j
+end
 ff(v)=sqrt(1-v^2/c^2)
 momentum_exp(ψ) = im/2.0*(-ψ[1:end-1]'*diff(ψ) + diff(ψ)'*ψ[1:end-1])
 
