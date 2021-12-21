@@ -89,11 +89,19 @@ end
 simSoliton = Sim(sim,γ = γ,tf=tf,t=t,ϕi=ϕi)
 @time sols3 = runsim(simSoliton);
 
+kx = K[1]
+
+ϕf = sols[50]
+ψf = xspace(ϕf,simSoliton)
+
+plot(x,current(ψf,kx),legend=false)
+xaxis!(L"x/x_0")
+yaxis!(L"J")
+savefig("current.pdf")
 
 
-
-
-
+psi_0=XField(ψf,X,K,K2)
+plot(x,velocity2(psi_0))
 
 #plot(xnt)
 Ms = [0.0001,0.00015,0.0002]
