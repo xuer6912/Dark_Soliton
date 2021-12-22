@@ -328,3 +328,60 @@ ylabel!(L"\int dx|\nabla_x J|^2")
 plot(plot1,plot2,plot3,layout = (3,1),size=(600,600))
 savefig("total_energy_damp.pdf")
 
+
+
+
+
+
+ψ1 = xspace(sols[1],simSoliton)
+psi=XField(ψ1,X,K,K2)
+Ekit = Energy(psi)[1]
+Ept = Energy(psi)[2]
+p1 = plot(x,Ept/μ)
+xlims!(-10,10)
+tn = t[1]
+title!("t = $tn ")
+xlabel!(L"x/a_x"); ylabel!(L"E_p/\mu")
+
+ψ2 = xspace(sols[51],simSoliton)
+psi=XField(ψ2,X,K,K2)
+Ekit = Energy(psi)[1]
+Ept = Energy(psi)[2]
+p2 = plot(x,Ept/μ)
+xlims!(-10,10)
+tn = t[51]
+title!("t = $tn ")
+xlabel!(L"x/a_x");  ylabel!(L"E_p/\mu")
+
+ψ3 = xspace(sols[101],simSoliton)
+psi=XField(ψ3,X,K,K2)
+Ekit = Energy(psi)[1]
+Ept = Energy(psi)[2]
+p3 = plot(x,Ept/μ)
+xlims!(-10,10)
+tn = t[101]
+title!("t = $tn ")
+xlabel!(L"x/a_x");  ylabel!(L"E_p/\mu")
+
+ψ4 = xspace(sols[152],simSoliton)
+psi=XField(ψ4,X,K,K2)
+Ekit = Energy(psi)[1]
+Ept = Energy(psi)[2]
+p4 = plot(x,Ept/μ)
+xlims!(-10,10)
+tn = t[152]
+title!("t = $tn ")
+xlabel!(L"x/a_x");  ylabel!(L"E_p/\mu")
+
+ψ5 = xspace(sols[199],simSoliton)
+psi=XField(ψ5,X,K,K2)
+Ekit = Energy(psi)[1]
+Ept = Energy(psi)[2]
+p5 = plot(x,Ept/μ)
+xlims!(-10,10)
+tn = t[200]
+title!("t = $tn ")
+xlabel!(L"x/a_x");  ylabel!(L"E_p/\mu")
+
+plot(p1,p2,p3,p4,p5,layout=(5,1),size=(1000,1500), legend = false)
+savefig("evolution03")
