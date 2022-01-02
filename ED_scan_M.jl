@@ -383,5 +383,20 @@ tn = t[200]
 title!("t = $tn ")
 xlabel!(L"x/a_x");  ylabel!(L"E_p/\mu")
 
-plot(p1,p2,p3,p4,p5,layout=(5,1),size=(1000,1500), legend = false)
-savefig("evolution03")
+plot(p2,p3,p4,p5,layout=(4,1),size=(1000,1000), legend = false)
+savefig("potential_dist.pdf")
+
+anim = @animate for i in 1:length(t)-4 #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    psi=XField(ψ,X,K,K2)
+    Ept = Energy(psi)[2]
+    plot(x,Ept)
+    xlims!(-10,10)
+    ylims!(-1250,500)
+    tn = t[i]
+    title!("$tn")
+    xlabel!(L"x/a_x")
+end
+filename = "pt.gif"
+gif(anim,filename,fps=30)
