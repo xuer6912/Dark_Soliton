@@ -2,7 +2,7 @@ using Plots, FourierGPE, LaTeXStrings,VortexDistributions, FFTW
 gr(fmt="pdf",legend=true,display = true,titlefontsize=12,size=(500,200),grid=false,colorbar=false);
 ## convenient plotting method
 
-plot(rand(10,10))
+
 
 ##system size
 ωs = 1/sqrt(2)
