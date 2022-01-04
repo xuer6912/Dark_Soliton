@@ -211,3 +211,23 @@ function solitondynamics2(sols,sim,t)
     ET = Ekt+Ept+Eit
     return ET,dJt
 end
+
+function trapdynamics(sols, sim, t)
+    ts = t
+    Ept = zeros(length(ts))
+    Ept_e = zeros(length(ts))
+    #Eit =  zeros(length(ts))
+    #Ns =  zeros(length(ts))
+    for i in 1:length(t)
+        ψ = xspace(sols[i], sim)
+        rhoi = abs2.(ψg)
+        rho = abs2.(ψ)
+        #psi = XField(ψ, X, K, K2)
+        Ep = 0.5 * (x .^ 2) .* (rho-rhoi)
+        Ept[i] = sum(Ep) * dx
+        X_e = sum(x .* (rho-rhoi)) .* dx
+        norm = sum(rhoi).*dx
+        Ept_e[i] = 0.5 * X_e .^ 2/norm
+    end
+    return Ept, Ept_e
+end
