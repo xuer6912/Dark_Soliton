@@ -302,4 +302,4 @@ end
 
 a,b = position(sols,sim,t)
 plot(t,a)
-plot!(t,b)
+plot!(t,-b*20)
