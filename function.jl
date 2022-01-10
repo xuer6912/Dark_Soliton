@@ -269,7 +269,7 @@ end
 ##plot(a)
 #plot!(b)
 
-X_e = (sum(x .* (rho)) .* dx) / (sum(rho) .* dx)
+#X_e = (sum(x .* (rho)) .* dx) / (sum(rho) .* dx)
 
 function position(sols, sim, t)
     ts = t
@@ -300,6 +300,38 @@ function position(sols, sim, t)
     return xt2, X_e
 end
 
-a,b = position(sols,sim,t)
-plot(t,a)
-plot!(t,-b*20)
+#a,b = position(sols,sim,t)
+#plot(t,a)
+#plot!(t,-b*20)
+
+function PE(psi::XField{1})
+    @unpack psiX, K = psi
+    #kx = K[1]
+    ψ = psiX
+    rho = abs2.(ψ)
+    rhoi = abs2.(ψg)
+    Ep = 0.5 * (x .^ 2) .* (rho - rhoi)
+    return Ep
+end
+for i in 1:length(t)
+    ψ = xspace(sols[i], sim)
+    psi = XField(ψ, X, K, K2)
+    Ekt[i] = sum(Energy2(psi)[1]) * dx
+    Ept[i] = sum(Energy2(psi)[2]) * dx
+    Eit[i] = sum(Energy2(psi)[3]) * dx
+    dJt[i] = sum(diffcurrent(ψ, kx) .^ 2) * dx
+end
+
+
+
+anim = @animate for i in 1:length(t)-4 #make it periodic by ending early
+    ψ = xspace(sols[i], sim)
+    psi = XField(ψ, X, K, K2)
+    Epx = PE(psi) 
+    plot(x,Epx)
+    xlims!(-10,10); #ylims!(0,1.3*μ)
+    title!(L"\textrm{local}\; \mu(x)")
+    xlabel!(L"x/a_x"); ylabel!(L"E_p")
+end
+filename = "potential_energy_distribution.gif"
+gif(anim,filename,fps=30)
