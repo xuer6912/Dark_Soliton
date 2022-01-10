@@ -313,15 +313,60 @@ function PE(psi::XField{1})
     Ep = 0.5 * (x .^ 2) .* (rho - rhoi)
     return Ep
 end
-for i in 1:length(t)
-    ψ = xspace(sols[i], sim)
-    psi = XField(ψ, X, K, K2)
-    Ekt[i] = sum(Energy2(psi)[1]) * dx
-    Ept[i] = sum(Energy2(psi)[2]) * dx
-    Eit[i] = sum(Energy2(psi)[3]) * dx
-    dJt[i] = sum(diffcurrent(ψ, kx) .^ 2) * dx
-end
 
+function trapdynamics2(sols, sim, t)
+    ts = t
+    Ept = zero(t)
+    #Ept_e = zero(t)
+    Ept_s = zero(t)
+    Ept_b = zero(t)
+    xt = zero(t)
+    xnt = zero(t)
+    #Eit =  zeros(length(ts))
+    #Ns =  zeros(length(ts))
+    for i in 1:length(t)
+        ψ = xspace(sols[i], sim)
+        psi = XField(ψ, X, K, K2)
+        mask = g * abs2.(ψi) .> 0.1 * μ
+        v = velocity2(psi)
+        vm = v[mask]
+        xm = x[mask]
+        xnt[i] = xm[findmax(abs.(vm))[2]]
+        if i == 1
+            xt[i] = xnt[1]
+        else
+            j = findall(a -> a == xt[i-1], x)[1]
+            mask2 = zero.(ψ)
+            mask2[j-2:j+2] .= 1
+            xt[i] = xm[findmax(abs.(vm .* mask2[mask]))[2]]
+        end
+        rhoi = abs2.(ψg)
+        rho = abs2.(ψ)
+        #psi = XField(ψ, X, K, K2)
+        Ep = 0.5 * (x .^ 2) .* (rho - rhoi)
+        Ept[i] = sum(Ep) * dx
+       #  X_e = sum(x .* (rho - rhoi)) .* dx
+        #norm = sum(rho) .* dx
+        #Ept_e[i] = 0.5 * X_e .^ 2 / norm
+        mask_s= abs.(x .-xt[i] ) .< 1
+        mask_b= abs.(x .-xt[i] ) .>1
+        Ept_s[i] = sum(Ep.*mask_s) * dx
+        Ept_b[i] = sum(Ep.*mask_b) * dx
+    end
+    return Ept, Ept_s,Ept_b,xt
+end
+ts = t[1:300]
+a,b,c,xt= trapdynamics2(sols,sim,ts)
+xt1 = xat(ΓMs[1],ts)
+vt1 = vat(ΓMs[1],ts)
+plot(ts,a,label="numeric")
+plot!(ts,b,label="filter")
+plot!(ts,Ep.(xt1,vt1),label="analytic")
+
+savefig("potential_energy.pdf")
+plot(xt)
+
+plot(t,)
 
 
 anim = @animate for i in 1:length(t)-4 #make it periodic by ending early
@@ -329,9 +374,18 @@ anim = @animate for i in 1:length(t)-4 #make it periodic by ending early
     psi = XField(ψ, X, K, K2)
     Epx = PE(psi) 
     plot(x,Epx)
+    vline!([xt[i]-1,xt[i]+1 ])
     xlims!(-10,10); #ylims!(0,1.3*μ)
     title!(L"\textrm{local}\; \mu(x)")
     xlabel!(L"x/a_x"); ylabel!(L"E_p")
 end
 filename = "potential_energy_distribution.gif"
 gif(anim,filename,fps=30)
+
+
+
+
+a = 0
+mask_s = abs.(x .-a ) .< 1
+x .* mask_s
+
