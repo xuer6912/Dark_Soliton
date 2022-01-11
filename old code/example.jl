@@ -149,3 +149,94 @@ function solitondynamics(sols,sim,t)
     end
     return xnt,xft,Ekit,Ept,Ns
 end
+
+
+ts = t[1:300]
+a,b,c,xt= trapdynamics2(sols,sim,ts)
+xt1 = xat(ΓMs[1],ts)
+vt1 = vat(ΓMs[1],ts)
+plot(ts,a,label="numeric")
+plot!(ts,b,label="filter")
+plot!(ts,Ep.(xt1,vt1),label="analytic")
+
+savefig("potential_energy.pdf")
+plot(xt)
+
+plot(t,)
+
+
+anim = @animate for i in 1:length(t)-4 #make it periodic by ending early
+    ψ = xspace(sols[i], sim)
+    psi = XField(ψ, X, K, K2)
+    Epx = PE(psi) 
+    plot(x,Epx)
+    vline!([xt[i]-1,xt[i]+1 ])
+    xlims!(-10,10); #ylims!(0,1.3*μ)
+    title!(L"\textrm{local}\; \mu(x)")
+    xlabel!(L"x/a_x"); ylabel!(L"E_p")
+end
+filename = "potential_energy_distribution.gif"
+gif(anim,filename,fps=30)
+
+
+
+
+a = 0
+mask_s = abs.(x .-a ) .< 1
+x .* mask_s
+
+
+function solitondynamics2(sols, sim, t)
+    ts = t
+    Ekt = zeros(length(ts))
+    Ept = zeros(length(ts))
+    Eit = zeros(length(ts))
+    dJt = zeros(length(ts))
+    #Eit =  zeros(length(ts))
+    #Ns =  zeros(length(ts))
+    for i in 1:length(t)
+        ψ = xspace(sols[i], sim)
+        psi = XField(ψ, X, K, K2)
+        Ekt[i] = sum(Energy2(psi)[1]) * dx
+        Ept[i] = sum(Energy2(psi)[2]) * dx
+        Eit[i] = sum(Energy2(psi)[3]) * dx
+        dJt[i] = sum(diffcurrent(ψ, kx) .^ 2) * dx
+    end
+    ET = Ekt + Ept + Eit
+    return ET, dJt
+end
+
+function solitondynamics(sols, sim, t)
+    ts = t
+    #xft = zero(t)#(nearest grid point)
+    xnt = zero(t)
+    xt2 = zero(t)
+    Ekit = zeros(length(ts))
+    Ept = zeros(length(ts))
+    #Eit =  zeros(length(ts))
+    Ns = zeros(length(ts))
+    for i in 1:length(t)
+        ψ = xspace(sols[i], sim)
+        psi = XField(ψ, X, K, K2)
+        mask = g * abs2.(ψi) .> 0.1 * μ
+        v = velocity2(psi)
+        vm = v[mask]
+        xm = x[mask]
+        xnt[i] = xm[findmax(abs.(vm))[2]]
+        if i == 1
+            xt2[i] = xnt[1]
+        else
+            j = findall(a -> a == xt2[i-1], x)[1]
+            mask2 = zero.(ψ)
+            mask2[j-2:j+2] .= 1
+            xt2[i] = xm[findmax(abs.(vm .* mask2[mask]))[2]]
+        end
+
+        #xnt2[i] = xm[findmin(abs2.(ψm))[2]]
+        Ekit[i] = sum(Energy(psi)[1]) * dx
+        Ept[i] = sum(Energy(psi)[2]) * dx
+        #Eit[i] = sum( Energy(psi)[3])*dx
+        Ns[i] = sum(abs2.(ψ) - abs2.(ψg)) * dx
+    end
+    return xt2, Ekit, Ept, Ns
+end
