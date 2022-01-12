@@ -235,7 +235,8 @@ ylabel!(L"E_{p}/\mu")
 
 p3 = plot(ts,Ei.(xt1,vt1)/μ,legend=:bottomleft,label="M = 0.0001")
 plot!(ts,Ei.(xt2,vt2)/μ,label="M = 0.00015")
-plot!(ts,Ei.(xt3,vt3)/μ,label="M = 0.0002")
+plot!(ts,Ei.(xt3,vt3)/μ,label="M = 0.0002")+
+
 xlabel!(L"t/t_0")
 ylabel!(L"E_{i}/\mu")
 #savefig("Etot.pdf")
