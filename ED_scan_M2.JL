@@ -121,7 +121,7 @@ xlabel!(L"t/t_0")
 ylabel!(L"x/x_0")
 ylims!(-R,R)
 #hline!([R/2],label=L"R/2")
-title!(L"M = 0.0001")
+title!(L"M_1 = 0.0001")
 
 
 
@@ -133,7 +133,7 @@ xlabel!(L"t/t_0")
 ylabel!(L"x/x_0")
 ylims!(-R,R)
 #hline!([R/2],label=L"R/2")
-title!(L"M = 0.00015")
+title!(L"M_1 = 0.00015")
 
 
 p3 = plot(ts,xnt3,legend=:bottomright,label=L"x_n")
@@ -143,7 +143,7 @@ xlabel!(L"t/t_0")
 ylabel!(L"x/x_0")
 ylims!(-R,R)
 #hline!([R/2],label=L"R/2")
-title!(L"M = 0.0002")
+title!(L"M_1 = 0.0002")
 #plot!(t,xt2)
 
 plot(p1,p2,p3,layout = (3,1),size = (600,800))
@@ -153,55 +153,55 @@ savefig("position_full.pdf")
 
 
 
-plot(ts,xnt,legend=:topleft,label="M = 0.0001")
-plot!(ts,xnt2,label="M = 0.00015")
-plot!(ts,xnt3,label="M = 0.0002")
+plot(ts,xnt,legend=:topleft,label=L"M_1 = 0.0001")
+plot!(ts,xnt2,label=L"M_1 = 0.00015")
+plot!(ts,xnt3,label=L"M_1 = 0.0002")
 xlabel!(L"t/t_0")
 ylabel!(L"x/x_0")
-ylims!(-10,10)
+ylims!(-6,6)
 savefig("position_num.pdf")
 
-plot(ts,xat(ΓMs[1],ts),legend=:topleft,label="M = 0.0001")
-plot!(ts,xat(ΓMs[2],ts),label="M = 0.00015")
-plot!(ts,xat(ΓMs[3],ts),label="M = 0.0002")
+plot(ts,xat(ΓMs[1],ts),legend=:topleft,label=L"M_1 = 0.0001")
+plot!(ts,xat(ΓMs[2],ts),label=L"M_1 = 0.00015")
+plot!(ts,xat(ΓMs[3],ts),label=L"M_1 = 0.0002")
 xlabel!(L"t/t_0")
 ylabel!(L"x/x_0")
-
+ylims!(-6,6)
 savefig("position_ana.pdf")
 
-plot(ts,vat(ΓMs[1]/c,ts),legend=:bottomright,label="M = 0.0001")
-plot!(ts,vat(ΓMs[2]/c,ts),label="M = 0.00015")
-plot!(ts,vat(ΓMs[3]/c,ts),label="M = 0.0002")
+plot(ts,vat(ΓMs[1]/c,ts),legend=:bottomright,label=L"M_1 = 0.0001")
+plot!(ts,vat(ΓMs[2]/c,ts),label=L"M_1 = 0.00015")
+plot!(ts,vat(ΓMs[3]/c,ts),label=L"M_1 = 0.0002")
 xlabel!(L"t/t_0")
 ylabel!(L"v/c")
 
 savefig("velocity_ana.pdf")
 
-plot(ts,Ns,legend=:bottomright,label="M = 0.0001")
-plot!(ts,Ns2,label="M = 0.00015")
-plot!(ts,Ns3,label="M = 0.0002")
+plot(ts,Ns,legend=:bottomright,label=L"M_1 = 0.0001")
+plot!(ts,Ns2,label=L"M_1 = 0.00015")
+plot!(ts,Ns3,label=L"M_1 = 0.0002")
 xlabel!(L"t/t_0")
 ylabel!(L"N_s")
 savefig("number.pdf")
 
 #########energy numeric
-p1 =plot(ts,Ekt/μ ,legend=:bottomleft,label="M = 0.0001")
-plot!(ts,Ekt2/μ,label="M = 0.00015")
-plot!(ts,Ekt3/μ,label="M = 0.0002")
+p1 =plot(ts,Ekt/μ ,legend=:bottomleft,label=L"M_1 = 0.0001")
+plot!(ts,Ekt2/μ,label=L"M_1 = 0.00015")
+plot!(ts,Ekt3/μ,label=L"M_1 = 0.0002")
 xlabel!(L"t/t_0")
 ylabel!(L"E_{k}/\mu")
 #savefig("Eki.pdf")
 
-p2 = plot(ts,Ept/μ,legend=:bottomleft,label="M = 0.0001")
-plot!(ts,Ept2/μ,label="M = 0.00015")
-plot!(ts,Ept3/μ,label="M = 0.0002")
+p2 = plot(ts,Ept/μ,legend=:bottomleft,label=L"M_1 = 0.0001")
+plot!(ts,Ept2/μ,label=L"M_1 = 0.00015")
+plot!(ts,Ept3/μ,label=L"M_1 = 0.0002")
 xlabel!(L"t/t_0")
 ylabel!(L"E_{p}/\mu")
 #savefig("Ep.pdf")
 
-p3 =plot(ts,Eit/μ ,legend=:bottomleft,label="M = 0.0001")
-plot!(ts,Eit2/μ,label="M = 0.00015")
-plot!(ts,Eit3/μ,label="M = 0.0002")
+p3 =plot(ts,Eit/μ ,legend=:bottomleft,label=L"M_1 = 0.0001")
+plot!(ts,Eit2/μ,label=L"M_1 = 0.00015")
+plot!(ts,Eit3/μ,label=L"M_1 = 0.0002")
 xlabel!(L"t/t_0")
 ylabel!(L"E_{i}/\mu")
 
@@ -218,24 +218,24 @@ vt1 = vat(ΓMs[1],ts)
 vt2 = vat(ΓMs[2],ts)
 vt3 = vat(ΓMs[3],ts)
 
-p1 =plot(ts,Ek.(xt1,vt1)/μ,legend=:bottomleft,label="M = 0.0001")
-plot!(ts,Ek.(xt2,vt2)/μ,label="M = 0.00015")
-plot!(ts,Ek.(xt3,vt3)/μ,label="M = 0.0002")
+p1 =plot(ts,Ek.(xt1,vt1)/μ,legend=:bottomleft,label=L"M_1 = 0.0001")
+plot!(ts,Ek.(xt2,vt2)/μ,label=L"M_1 = 0.00015")
+plot!(ts,Ek.(xt3,vt3)/μ,label=L"M_1 = 0.0002")
 xlabel!(L"t/t_0")
 ylabel!(L"E_{k}/\mu")
 #savefig("Eki.pdf")
 
-p2 = plot(ts,Ep.(xt1,vt1)/μ,legend=:bottomleft,label="M = 0.0001")
-plot!(ts,Ep.(xt2,vt2)/μ,label="M = 0.00015")
-plot!(ts,Ep.(xt3,vt3)/μ,label="M = 0.0002")
+p2 = plot(ts,Ep.(xt1,vt1)/μ,legend=:bottomleft,label=L"M_1 = 0.0001")
+plot!(ts,Ep.(xt2,vt2)/μ,label=L"M_1 = 0.00015")
+plot!(ts,Ep.(xt3,vt3)/μ,label=L"M_1 = 0.0002")
 xlabel!(L"t/t_0")
 ylabel!(L"E_{p}/\mu")
 #savefig("Ep.pdf")
 
 
-p3 = plot(ts,Ei.(xt1,vt1)/μ,legend=:bottomleft,label="M = 0.0001")
-plot!(ts,Ei.(xt2,vt2)/μ,label="M = 0.00015")
-plot!(ts,Ei.(xt3,vt3)/μ,label="M = 0.0002")+
+p3 = plot(ts,Ei.(xt1,vt1)/μ,legend=:bottomleft,label=L"M_1 = 0.0001")
+plot!(ts,Ei.(xt2,vt2)/μ,label=L"M_1 = 0.00015")
+plot!(ts,Ei.(xt3,vt3)/μ,label=L"M_1 = 0.0002")
 
 xlabel!(L"t/t_0")
 ylabel!(L"E_{i}/\mu")
@@ -287,7 +287,47 @@ savefig("solitonEnergy.pdf")
 
 
 
+xat1 = zero(ts)#(nearest grid point)
+xnt1 = zero(ts)
+K2=k2(K)
+for i in 1:length(ts)#make it periodic by ending early
+    ψ = xspace(sols[i],sim)
+    psi=XField(ψ,X,K,K2)
+    v=velocity2(psi)
+    mask = g*abs2.(ψi).>0.1*μ
+    v_mask = v[mask]
+    x_mask = x[mask]
+    xnt1[i] = x_mask[findmax(abs.(v_mask))[2]]
+    ΔS = DS(ψ[mask])
+    ϕ =    unwrap(S(ψ[mask]))
+    dϕ = diff(ϕ)/(dx*ΔS)
+    xm = x[mask]
+    xat1[i] = xm[1:end-1]'*dϕ *dx
+  
+end
 
+n = zeros(length(t),N[1])
+##
+for i in 1:length(t) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    n[i,:] = abs2.(ψ) 
+    #xlims!(-10,10); ylims!(-1000,1000)
+    #title!(L"\textrm{local}\; \mu(x)")
+    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+end
+
+##
+heatmap(t,x,n')
+ylims!(-6,6)
+xlabel!(L"t/t_0")
+ylabel!(L"x/x_0")
+#zlabel!(L"n(x)x_0")
+plot!(ts, xat1, label="analytic")
+#xi=xat1[44]
+#plot!(ts[44:end],xi*exp.(μ*μ/g*2/15*M*ts[44:end]),legend=false)
+
+#plot!(ts[44:end],-xi*exp.(μ*μ/g*2/15*M*ts[44:end]),legend=false)
 
 #########
 p0 = plot(ts, xat(ΓMs[1],ts),label=L"x_a",legend=:bottomright)
