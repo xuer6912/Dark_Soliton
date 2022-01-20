@@ -141,15 +141,19 @@ DS(ψ) = sum(diff(unwrap(S(ψ)))) #phase change
 #E(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*c*(1-v.^2/c^2).^(3/2)-2*v*μ/g*(1-x.^2/R^2)*ξ*c*(1-v.^2/c^2).^(1/2)
 #Eki(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*c*(1-v.^2/c^2).^(3/2)
 #Ep(x,v) = -x.^2*μ/g*(1-x.^2/R^2)*ξ*c*(1-v.^2/c^2).^(1/2)
-xat(ΓM, t) = vi * sqrt(2) * exp.(ΓM * t) .* sin.(sqrt(ωs^2 - ΓM^2) * t)
-vat(ΓM, t) = vi * sqrt(2) * ΓM * exp.(ΓM * t) .* sin.(sqrt(ωs^2 - ΓM^2) * t) + vi * sqrt(2) * sqrt(ωs^2 - ΓM^2) * exp.(ΓM * t) .* cos.(sqrt(ωs^2 - ΓM^2) * t)
+#xat(ΓM, t) = vi * sqrt(2) * exp.(ΓM * t) .* sin.(sqrt(ωs^2 - ΓM^2) * t)
+#vat(ΓM, t) = vi * sqrt(2) * ΓM * exp.(ΓM * t) .* sin.(sqrt(ωs^2 - ΓM^2) * t) + vi * sqrt(2) * sqrt(ωs^2 - ΓM^2) * exp.(ΓM * t) .* cos.(sqrt(ωs^2 - ΓM^2) * t)
+xat(ΓM, t) = vi * sqrt(2) * exp.(ΓM * t) .* sin.(ωs * t)
+vat(ΓM, t) = vi * sqrt(2) * ΓM * exp.(ΓM * t) .* sin.(ωs * t) + vi * sqrt(2) * ωs * exp.(ΓM * t) .* cos.(ωs * t)
 C(x) = sqrt(μ * (1 - x .^ 2 / R^2))
 #E(x,v) = 4/3 *μ/g*(1-x.^2/R^2)*C.(x) *(1-v.^2 ./C.(x)^2).^(3/2)-x.^2*μ/g*(1-x.^2/R^2)*ξ*C.(x)*(1-v.^2 ./C.(x)^2).^(1/2)
 Ek(x, v) = 2 / 3 * μ / g * (1 - x .^ 2 / R^2) * C.(x) * (1 - v .^ 2 ./ C.(x)^2) .^ (3 / 2)
 Ei(x, v) = 2 / 3 * μ / g * (1 - x .^ 2 / R^2) * C.(x) * (1 - v .^ 2 ./ C.(x)^2) .^ (3 / 2)
 Ep(x, v) = -x .^ 2 * μ / g * (1 - x .^ 2 / R^2) * ξ * (1 - v .^ 2 ./ C.(x)^2) .^ (1 / 2)
-E(x, v) = Ek(x, v) + Ei(x, v) +Ep(x, v)
-
+E(x, v) = Ek(x, v) + Ei(x, v) + Ep(x, v)
+Eat(ΓM, t) = -2 * μ / g / c * (xat(ΓM, t)^2 / 2 + vat(ΓM, t)^2) * (1 - xat(ΓM, t) .^ 2 / R^2) + 4 / 3 * μ / g * c
+Eat2(ΓM, t) = -2 * μ / g / c * vi^2 * exp.(2 * ΓM * t) + 4 / 3 * μ / g * c
+#Eat(ΓM, t) = -4 * μ / g / C.(xat(ΓM, t)) * ( xat(ΓM, t)^2 + vat(ΓM, t)^2 / 2) + 4 / 3 * μ / g * C.(xat(ΓM, t))
 
 
 
@@ -196,10 +200,10 @@ function solitondynamics(sols, sim, t)
         end
 
         #xnt2[i] = xm[findmin(abs2.(ψm))[2]]
-        mask_s= abs.(x .-xt2[i] ) .< 1
-        Ekt[i] = sum(Energy(psi)[1] .*mask_s) * dx
-        Eit[i] = sum(Energy(psi)[3] .*mask_s) * dx  
-        Ept[i] = sum(Energy(psi)[2] .*mask_s) * dx
+        mask_s = abs.(x .- xt2[i]) .< 1
+        Ekt[i] = sum(Energy(psi)[1] .* mask_s) * dx
+        Eit[i] = sum(Energy(psi)[3] .* mask_s) * dx
+        Ept[i] = sum(Energy(psi)[2] .* mask_s) * dx
         Ns[i] = sum(abs2.(ψ) - abs2.(ψg)) * dx
     end
     return xt2, Ekt, Ept, Eit, Ns
