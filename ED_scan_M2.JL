@@ -288,9 +288,10 @@ savefig("Energy_comp.pdf")
 ##total enenrgy
 
 p1 = plot(ts, Ek.(xt1, vt1) / μ + Ei.(xt1, vt1) / μ + Ep.(xt1, vt1) / μ, legend = :bottomleft, label = "analytic")
-plot!(ts, Ekt / μ + Eit / μ + Ept / μ, legend = :bottomleft, label = "numerical")
-plot!(ts, Eat.(ΓMs[1], ts) / μ, legend = :bottomleft, label = L"Taylor")
-plot!(ts, Eat2.(ΓMs[1], ts) / μ, legend = :bottomleft, label = L"M_s x_i^2 \omega_s^2 e^{2 \Gamma t}/2")
+plot!(ts, Ekt / μ + Eit / μ + Ept / μ .+ 0.2, legend = :bottomleft, label = "numerical")
+#plot!(ts, Eat.(ΓMs[1], ts) / μ, legend = :bottomleft, label = L"Taylor")
+plot!(ts, Eat3.(ΓMs[1], ts) / μ, legend = :bottomleft, label = L"M_s x_i^2 \omega_s^2 e^{2 \Gamma t}/2")
+ylims!(0, 70)
 savefig("Eat.pdf")
 plot(ts[1:end-1], diff(Eat.(ΓMs[1], ts) / μ), legend = :bottomleft, label = L"dE_s/dt")
 #plot!(ts, Eat.(ΓMs[2], ts), label = L"M_1 = 0.00015")
@@ -299,6 +300,19 @@ xlabel!(L"t/t_0")
 savefig("dEsdt.pdf")
 
 
+plot(ts, mass_s.(ΓMs[1], ts))
+#p1 = plot(ts, Ek.(xt1, vt1) / μ + Ei.(xt1, vt1) / μ + Ep.(xt1, vt1) / μ, legend = :bottomleft, label = "analytic")
+plot(ts, Ekt / μ + Eit / μ, legend = :bottomleft, label = "numerical")
+plot!(ts, Eat.(ΓMs[1], ts) / μ, label = L"Taylor")
+plot!(ts, Eat2.(ΓMs[1], ts) / μ, label = L"M_s x_i^2 \omega_s^2 e^{2 \Gamma t}/2")
+ylims!(0, 70)
+
+savefig("Eat.pdf")
+plot(ts[1:end-1], diff(Eat.(ΓMs[1], ts) / μ), legend = :bottomleft, label = L"dE_s/dt")
+#plot!(ts, Eat.(ΓMs[2], ts), label = L"M_1 = 0.00015")
+#plot!(ts, Eat.(ΓMs[3], ts), label = L"M_1 = 0.0002")
+xlabel!(L"t/t_0")
+savefig("dEsdt.pdf")
 
 
 
