@@ -94,7 +94,7 @@ T = 30e-9
 ϵc(μ) = 2*μ
 μr = LinRange(.5, 10,100)*μ1
 p1 = plot(μr/(ħ*wz), Γ_γ.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_\gamma",legend=:topleft)
-plot!(μr/(ħ*wz) , Γ_M.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,label=L"\Gamma_M",size = (600,300))
+plot!(μr/(ħ*wz) , Γ_M.(μr)*sqrt(2)/wz, xaxis=:log, yaxis=:log,:dash,label=L"\Gamma_M",size = (600,300),linesty)
 
 vline!([0.5wr/wz],label =L"50\hbar\omega_z")
 xlabel!(L"\mu/\hbar\omega_z")
