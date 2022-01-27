@@ -193,44 +193,59 @@ ylims!(-2.5,2.5)
 
 ##
 ϕ1 = sols[1]
-ψ1 = xspace(ϕf,simSoliton)
-p1 = plot(x,g*abs2.(ψf), legend = false)
-xlims!(-10,10); ylims!(0,1.3*μ)
+ψ1 = xspace(ϕ1,simSoliton)
+p1 = plot(x,abs2.(ψ1), legend = false)
+xlims!(-10,10)#; ylims!(0,1.3*μ)
 tn = t[1]
-title!("t = $tn ")
-xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+titlename = latexstring("\$t\\ \\omega_x  = {$(tn)}\$")
+title!(titlename)
+
+xlabel!(L"x/a_x")
+ylabel!(L"|\psi|^2\ a_x")
 
 ψ2 = xspace(sols[51],simSoliton)
-p2 = plot(x,g*abs2.(ψ2))
-xlims!(-10,10); ylims!(0,1.3*μ)
-tn = t[51]
-title!("t = $tn ")
-xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+p2 = plot(x,abs2.(ψ2))
+xlims!(-10,10)
+tn = round(t[51],digits= 3)
+titlename = latexstring("\$t\\ \\omega_x  = {$(tn)}\$")
+title!(titlename)
+
+xlabel!(L"x/a_x")
+ylabel!(L"|\psi|^2\ a_x")
 
 ψ3 = xspace(sols[101],simSoliton)
-p3 = plot(x,g*abs2.(ψ3))
-xlims!(-10,10); ylims!(0,1.3*μ)
-tn = t[101]
-title!("t = $tn ")
-xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+p3 = plot(x,abs2.(ψ3))
+xlims!(-10,10)
+tn = round(t[101],digits= 3)
+titlename = latexstring("\$t\\ \\omega_x  = {$(tn)}\$")
+title!(titlename)
 
+xlabel!(L"x/a_x")
+ylabel!(L"|\psi|^2\ a_x")
 ψ4 = xspace(sols[152],simSoliton)
-p4 = plot(x,g*abs2.(ψ4))
-xlims!(-10,10); ylims!(0,1.3*μ)
-tn = t[152]
-title!("t = $tn ")
-xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+
+p4 = plot(x,abs2.(ψ4))
+xlims!(-10,10)
+tn =round(t[152],digits= 3)
+titlename = latexstring("\$t\\ \\omega_x  = {$(tn)}\$")
+title!(titlename)
+
+xlabel!(L"x/a_x")
+ylabel!(L"|\psi|^2\ a_x")
 
 ψ5 = xspace(sols[199],simSoliton)
-p5 = plot(x,g*abs2.(ψ5))
-xlims!(-10,10); ylims!(0,1.3*μ)
-tn = t[200]
-title!("t = $tn ")
-xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+p5 = plot(x,abs2.(ψ5))
+xlims!(-10,10)
+tn = round(t[200],digits= 3)
+titlename = latexstring("\$t\\ \\omega_x  = {$(tn)}\$")
+title!(titlename)
+
+xlabel!(L"x/a_x")
+ylabel!(L"|\psi|^2\ a_x")
 
 
-plot(p1,p2,p3,p4,p5,layout=(5,1),size=(1000,1500), legend = false)
-savefig("evolution03")
+plot(p1,p2,p3,p4,p5,layout=(5,1),size=(1000,1000), legend = false)
+savefig("evolution03.pdf")
 anim = @animate for i in 1:length(t)-4 #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
     ψ = xspace(sols[i],simSoliton)
@@ -244,7 +259,23 @@ end
 filename = "z03.gif"
 gif(anim,filename,fps=30)
 
-
+ts = t[1:600]
+n = zeros(length(ts),N[1])
+##
+for i in 1:length(ts) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    n[i,:] = abs2.(ψ) 
+    phase[i,:] = angle.(ψ)
+    #xlims!(-10,10); ylims!(-1000,1000)
+    #title!(L"\textrm{local}\; \mu(x)")
+    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+end
+heatmap(ts,x,n', colorbar=true,colorbar_title=L"|\psi|^2 a_x")
+ylims!(-10,10)
+xlabel!(L"t\ \omega_x")
+ylabel!(L"x/a_x")
+savefig("nodamping03.pdf")
 
 ts = t[1:100]
 n = zeros(length(t),N[1])

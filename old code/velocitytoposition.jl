@@ -130,11 +130,13 @@ for i in 1: length(vrange)
 end
 ##
 plot(Xa)
-plot(vrange[1:45]/c, Xn[1:45],legend = false)
-plot!(vrange[1:45]/c,vrange[1:45]*sqrt(2))
-xlabel!(L"v/c")
-ylabel!(L"x/x_0")
-savefig("xv1")
+plot(vrange[1:40]/c, Xn[1:40],legend = :bottomright,label="numerical")
+plot!(vrange[1:40]/c,vrange[1:40]*sqrt(2),label="analytical",size=(600,400))
+xlabel!(L"v_{max}/c")
+ylabel!(L"x_{max}/a_x")
+xlims!(0,0.4)
+ylims!(0,3.5)
+savefig("xv1.pdf")
 
 plot(vrange[1:40], Xn[1:40],legend = false)
 plot!(vrange[1:45],vrange[1:45]*sqrt(2))

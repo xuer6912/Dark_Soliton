@@ -157,7 +157,7 @@ Eat3(ΓM, t) = -2 * μ / g / C.(xat(ΓM, t)) * vi^2 * exp.(2 * ΓM * t) * (1 - x
 #Eat(ΓM, t) = -4 * μ / g / C.(xat(ΓM, t)) * ( xat(ΓM, t)^2 + vat(ΓM, t)^2 / 2) + 4 / 3 * μ / g * C.(xat(ΓM, t))
 
 mass_s(ΓM, t) = -2 * μ / g / C.(xat(ΓM, t)) * (1 - xat(ΓM, t) .^ 2 / R^2)
-savefig("mass_ds")
+#savefig("mass_ds")
 #a, b = Kone_mode(sols, sim, t)
 ##plot(a)
 #plot!(b)

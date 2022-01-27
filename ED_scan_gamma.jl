@@ -81,8 +81,8 @@ xnt3,Ekt3,Ept3,Eit3,Ns3 = solitondynamics(sols3,sim,ts)
 p1 = plot(ts,xnt,legend=:bottomright,label=L"x_n")
 plot!(ts, xat(Γs[1],ts),label=L"x_a")
 plot!(ts,vi*sqrt(2)*exp.(Γs[1]*ts),label=L"e^{\Gamma t}")
-xlabel!(L"t/t_0")
-ylabel!(L"x/x_0")
+xlabel!(L"t\ \omega_x")
+ylabel!(L"x_s/a_x")
 ylims!(-R,R)
 #hline!([R/2],label=L"R/2")
 title!(L"\gamma = 0.01")
@@ -93,8 +93,8 @@ title!(L"\gamma = 0.01")
 p2 = plot(ts,xnt2,legend=:bottomright,label=L"x_n")
 plot!(ts, xat(Γs[2],ts),label=L"x_a")
 plot!(ts,vi*sqrt(2)*exp.(Γs[2]*ts),label=L"e^{\Gamma t}")
-xlabel!(L"t/t_0")
-ylabel!(L"x/x_0")
+xlabel!(L"t\ \omega_x")
+ylabel!(L"x_s/a_x")
 ylims!(-R,R)
 #hline!([R/2],label=L"R/2")
 title!(L"\gamma = 0.015")
@@ -103,8 +103,8 @@ title!(L"\gamma = 0.015")
 p3 = plot(ts,xnt3,legend=:bottomright,label=L"x_n")
 plot!(ts, xat(Γs[3],ts),label=L"x_a")
 plot!(ts,vi*sqrt(2)*exp.(Γs[3]*ts),label=L"e^{\Gamma t}")
-xlabel!(L"t/t_0")
-ylabel!(L"x/x_0")
+xlabel!(L"t\ \omega_x")
+ylabel!(L"x_s/a_x")
 ylims!(-R,R)
 #hline!([R/2],label=L"R/2")
 title!(L"\gamma = 0.02")
@@ -120,31 +120,31 @@ savefig("position_comp_g.pdf")
 plot(ts,xnt,legend=:bottomleft,label=L"\gamma = 0.01")
 plot!(ts,xnt2,label=L"\gamma = 0.015")
 plot!(ts,xnt3,label=L"\gamma = 0.02")
-xlabel!(L"t/t_0")
-ylabel!(L"x/x_0")
+xlabel!(L"t\ \omega_x")
+ylabel!(L"x_s/a_x")
 ylims!(-6,6)
 savefig("position_num_g.pdf")
 
 plot(ts,xat(Γs[1],ts),legend=:topleft,label=L"\gamma = 0.01")
 plot!(ts,xat(Γs[2],ts),label=L"\gamma = 0.015")
 plot!(ts,xat(Γs[3],ts),label=L"\gamma = 0.02")
-xlabel!(L"t/t_0")
-ylabel!(L"x/x_0")
+xlabel!(L"t\ \omega_x")
+ylabel!(L"x_s/a_x")
 ylims!(-6,6)
 savefig("position_ana_g.pdf")
 
 plot(ts,vat(Γs[1]/c,ts),legend=:bottomright,label=L"\gamma = 0.01")
 plot!(ts,vat(Γs[2]/c,ts),label=L"\gamma = 0.015")
 plot!(ts,vat(Γs[3]/c,ts),label=L"\gamma = 0.02")
-xlabel!(L"t/t_0")
-ylabel!(L"v/c")
+xlabel!(L"t\ \omega_x")
+ylabel!(L"v_s/c")
 
 savefig("velocity_ana_g.pdf")
 
 plot(ts,Ns,legend=:topleft,label=L"\gamma = 0.01")
 plot!(ts,Ns2,label=L"\gamma = 0.015")
 plot!(ts,Ns3,label=L"\gamma = 0.02")
-xlabel!(L"t/t_0")
+xlabel!(L"t\ \omega_x")
 ylabel!(L"N_s")
 savefig("number_g.pdf")
 
@@ -152,14 +152,15 @@ savefig("number_g.pdf")
 p1 =plot(ts,Ekt/μ ,legend=:bottomleft,label=L"\gamma = 0.01")
 plot!(ts,Ekt2/μ,label=L"\gamma = 0.015")
 plot!(ts,Ekt3/μ,label=L"\gamma = 0.02")
-xlabel!(L"t/t_0")
+xlabel!(L"t\ \omega_x")
+
 ylabel!(L"E_{k}/\mu")
 #savefig("Eki.pdf")
 
 p2 = plot(ts,Ept/μ,legend=:bottomleft,label=L"\gamma = 0.01")
 plot!(ts,Ept2/μ,label=L"\gamma = 0.015")
 plot!(ts,Ept3/μ,label=L"\gamma = 0.02")
-xlabel!(L"t/t_0")
+xlabel!(L"t\ \omega_x")
 ylabel!(L"E_{p}/\mu")
 #savefig("Ep.pdf")
 
@@ -167,7 +168,7 @@ ylabel!(L"E_{p}/\mu")
 p3 = plot(ts,Eit/μ,legend=:bottomleft,label=L"\gamma = 0.01")
 plot!(ts,Eit2/μ,label=L"\gamma = 0.015")
 plot!(ts,Eit3/μ,label=L"\gamma = 0.02")
-xlabel!(L"t/t_0")
+xlabel!(L"t\ \omega_x")
 ylabel!(L"E_{i}/\mu")
 #savefig("Etot.pdf")
 plot(p1,p2,p3,layout = (3,1),size = (700,800))
@@ -185,14 +186,14 @@ vt3 = vat(Γs[3],ts)
 p1 =plot(ts,Ek.(xt1,vt1)/μ,legend=:bottomleft,label=L"\gamma = 0.01")
 plot!(ts,Ek.(xt2,vt2)/μ,label=L"\gamma = 0.015")
 plot!(ts,Ek.(xt3,vt3)/μ,label=L"\gamma = 0.02")
-xlabel!(L"t/t_0")
+xlabel!(L"t\ \omega_x")
 ylabel!(L"E_{k}/\mu")
 #savefig("Eki.pdf")
 
 p2 = plot(ts,Ep.(xt1,vt1)/μ,legend=:bottomleft,label=L"\gamma = 0.01")
 plot!(ts,Ep.(xt2,vt2)/μ,label=L"\gamma = 0.015")
 plot!(ts,Ep.(xt3,vt3)/μ,label=L"\gamma = 0.02")
-xlabel!(L"t/t_0")
+xlabel!(L"t\ \omega_x")
 ylabel!(L"E_{p}/\mu")
 #savefig("Ep.pdf")
 
@@ -200,7 +201,7 @@ ylabel!(L"E_{p}/\mu")
 p3 = plot(ts,Ei.(xt1,vt1)/μ,legend=:bottomleft,label=L"\gamma = 0.01")
 plot!(ts,Ei.(xt2,vt2)/μ,label=L"\gamma = 0.015")
 plot!(ts,Ei.(xt3,vt3)/μ,label=L"\gamma = 0.02")
-xlabel!(L"t/t_0")
+xlabel!(L"t\ \omega_x")
 ylabel!(L"E_{i}/\mu")
 #savefig("Etot.pdf")
 plot(p1,p2,p3,layout = (3,1),size = (700,800))
@@ -217,15 +218,15 @@ savefig("Energy_ana_g.pdf")
 
 p1 = plot(ts,Ek.(xt1,vt1)/μ,legend=:bottomleft,label ="analytic" )
 plot!(ts,Ekt/μ,label ="numeric")
-xlabel!(L"t/t_0")
+xlabel!(L"t\ \omega_x")
 ylabel!(L"E_k/\mu")
 p2 = plot(ts,Ep.(xt1,vt1)/μ,legend=:bottomleft,label ="analytic" )
 plot!(ts,Ept/μ,label ="numeric")
-xlabel!(L"t/t_0")
+xlabel!(L"t\ \omega_x")
 ylabel!(L"E_p/\mu")
 p3 = plot(ts,Ei.(xt1,vt1)/μ,legend=:bottomleft,label ="analytic" )
 plot!(ts,Eit/μ,label ="numeric")
-xlabel!(L"t/t_0")
+xlabel!(L"t\ \omega_x")
 ylabel!(L"E_i/\mu")
 
 
@@ -233,16 +234,51 @@ plot(p1,p2,p3,layout = (3,1),size = (800,800))
 title!(L"\gamma=0.01")
 savefig("Energy_comp_g.pdf")
 
+
+
+ts = t[1:600]
+n = zeros(length(ts),N[1])
+##
+for i in 1:length(ts) #make it periodic by ending early
+    #ψi = ψ0.(x,μ,g)
+    ψ = xspace(sols[i],simSoliton)
+    n[i,:] = abs2.(ψ) 
+    #xlims!(-10,10); ylims!(-1000,1000)
+    #title!(L"\textrm{local}\; \mu(x)")
+    #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
+end
+
+##
+heatmap(ts,x,n', colorbar=true,colorbar_title=L"|\psi|^2 a_x")
+ylims!(-10,10)
+xlabel!(L"t\ \omega_x")
+ylabel!(L"x/a_x")
+savefig("xs_numberdamp.pdf")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 v_scan = LinRange(0,1,100)*c
 p1 = plot(v_scan/c,E.(0,v_scan)/μ,label=L"x_i = 0")
-xlabel!(L"v/c")
-ylabel!(L"E/\mu")
+xlabel!(L"v_s/c")
+ylabel!(L"E_s/\mu")
 
 
 x_scan = LinRange(0,R,100)
 p2 = plot(x_scan/R,E.(x_scan,0)/μ,label=L"v_i = 0")
-xlabel!(L"x/R")
-ylabel!(L"E/\mu")
+xlabel!(L"x_s/R")
+ylabel!(L"E_s/\mu")
 
 plot(p1,p2,layout= (1,2),size=(600,250))
 savefig("solitonEnergy_g.pdf")
@@ -271,8 +307,8 @@ ET3,dJt3 =solitondynamics2(sols3,sim,ts)
 plot1 = plot(ts,ET/μ,legend=:topleft,label=L"\gamma=0.01")
 plot!(ts,ET2/μ,label=L"\gamma=0.015")
 plot!(ts,ET3/μ,label=L"\gamma=0.02")
-xlabel!(L"t/t_0")
-ylabel!(L"E_{tot}/\mu")
+xlabel!(L"t\ \omega_x")
+ylabel!(L"E_{s}/\mu")
 
 
 plot2 = plot(ts, xt1.^2,legend=:topleft,label=L"\gamma=0.01" )
