@@ -106,7 +106,7 @@ kx = K[1]
 dx = x[2] - x[1];
 n = sum(abs2.(ψf)) * dx;
 plot(x, current(ψf, kx), legend = false)
-xlims!(-10,10)
+xlims!(-10, 10)
 xaxis!(L"x/a_x")
 yaxis!(L"j\ a_x^2")
 
@@ -429,7 +429,10 @@ Ekit = Energy(psi)[1]
 Ept = Energy(psi)[2]
 p1 = plot(x, Ept / μ)
 xlims!(-10, 10)
-tn = t[1]
+
+tn = round(t[1], digits = 3)
+titlename = latexstring("\$t\\ \\omega_x  = {$(tn)}\$")
+title!(titlename)
 title!("t = $tn ")
 xlabel!(L"x/a_x");
 ylabel!(L"E_p/\mu");
@@ -440,8 +443,9 @@ Ekit = Energy(psi)[1]
 Ept = Energy(psi)[2]
 p2 = plot(x, Ept / μ)
 xlims!(-10, 10)
-tn = t[51]
-title!("t = $tn ")
+tn = round(t[51], digits = 3)
+titlename = latexstring("\$t\\ \\omega_x  = {$(tn)}\$")
+title!(titlename)
 xlabel!(L"x/a_x");
 ylabel!(L"E_p/\mu");
 
@@ -451,8 +455,9 @@ Ekit = Energy(psi)[1]
 Ept = Energy(psi)[2]
 p3 = plot(x, Ept / μ)
 xlims!(-10, 10)
-tn = t[101]
-title!("t = $tn ")
+tn = round(t[101], digits = 3)
+titlename = latexstring("\$t\\ \\omega_x  = {$(tn)}\$")
+title!(titlename)
 xlabel!(L"x/a_x");
 ylabel!(L"E_p/\mu");
 
@@ -462,8 +467,9 @@ Ekit = Energy(psi)[1]
 Ept = Energy(psi)[2]
 p4 = plot(x, Ept / μ)
 xlims!(-10, 10)
-tn = t[152]
-title!("t = $tn ")
+tn = round(t[152], digits = 3)
+titlename = latexstring("\$t\\ \\omega_x  = {$(tn)}\$")
+title!(titlename)
 xlabel!(L"x/a_x");
 ylabel!(L"E_p/\mu");
 
@@ -473,8 +479,9 @@ Ekit = Energy(psi)[1]
 Ept = Energy(psi)[2]
 p5 = plot(x, Ept / μ)
 xlims!(-10, 10)
-tn = t[200]
-title!("t = $tn ")
+tn = round(t[199], digits = 3)
+titlename = latexstring("\$t\\ \\omega_x  = {$(tn)}\$")
+title!(titlename)
 xlabel!(L"x/a_x");
 ylabel!(L"E_p/\mu");
 
@@ -516,20 +523,20 @@ savefig("sech.pdf")
 
 
 ts = t[1:600]
-n = zeros(length(ts),N[1])
+n = zeros(length(ts), N[1])
 ##
 for i in 1:length(ts) #make it periodic by ending early
     #ψi = ψ0.(x,μ,g)
-    ψ = xspace(sols[i],simSoliton)
-    n[i,:] = abs2.(ψ) 
+    ψ = xspace(sols[i], simSoliton)
+    n[i, :] = abs2.(ψ)
     #xlims!(-10,10); ylims!(-1000,1000)
     #title!(L"\textrm{local}\; \mu(x)")
     #xlabel!(L"x/a_x"); ylabel!(L"\mu(x)/\hbar\omega_x")
 end
 
 ##
-heatmap(ts,x,n', colorbar=true,colorbar_title=L"|\psi|^2 a_x")
-ylims!(-10,10)
+heatmap(ts, x, n', colorbar = true, colorbar_title = L"|\psi|^2 a_x")
+ylims!(-10, 10)
 xlabel!(L"t\ \omega_x")
 ylabel!(L"x/a_x")
 savefig("xs_energydamp.pdf")
