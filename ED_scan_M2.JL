@@ -281,7 +281,7 @@ ylabel!(L"E_i/\mu")
 
 plot(p1, p2, p3, layout = (3, 1), size = (800, 800))
 
-title!(L"M=0.0001")
+title!(L"M_1=0.0001")
 savefig("Energy_comp.pdf")
 
 ##total enenrgy
