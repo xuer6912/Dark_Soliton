@@ -108,7 +108,7 @@ n = sum(abs2.(ψf)) * dx;
 plot(x, current(ψf, kx), legend = false)
 xlims!(-10, 10)
 xaxis!(L"x/a_x")
-yaxis!(L"j\ a_x^2")
+yaxis!(L"j\ \omega_x")
 
 savefig("current.pdf")
 

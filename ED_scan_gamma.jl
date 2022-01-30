@@ -257,6 +257,13 @@ savefig("xs_numberdamp.pdf")
 
 
 
+plot(ts, Ek.(xt1, vt1) / μ + Ei.(xt1, vt1) / μ + Ep.(xt1, vt1) / μ, legend = :bottomleft, label = "analytic")
+plot!(ts, Ekt / μ + Eit / μ + Ept / μ .+ 0.2, legend = :bottomleft, label = "numerical")
+#plot!(ts, Eat.(ΓMs[1], ts) / μ, legend = :bottomleft, label = L"Taylor")
+#plot!(ts, Eat3.(ΓMs[1], ts) / μ, legend = :bottomleft, label = L"M_s x_i^2 \omega_s^2 e^{2 \Gamma t}/2")
+xlabel!(L"t\ \omega_x")
+ylabel!(L"E_s/\mu")
+savefig("Eat_g.pdf")
 
 
 
