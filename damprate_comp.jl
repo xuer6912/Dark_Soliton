@@ -57,7 +57,7 @@ end
 ########
 T = 30e-9
 ϵc(μ) = 2 * μ
-μr = LinRange(0.5, 10, 100) * μ1
+μr = LinRange(1, 10, 100) * μ1
 G1 = Γ_γ.(μr) * sqrt(2) / wz
 m1 = Γ_M.(μr) * sqrt(2) / wz
 ϵc(μ) = 2.5 * μ
@@ -92,7 +92,7 @@ savefig("dampratecut_comp.pdf")
 T = 12e-9
 GT1 = Γ_γ.(μr) * sqrt(2) / wz
 MT1 = Γ_M.(μr) * sqrt(2) / wz
-μr = LinRange(0.5, 10, 100) * μ1
+μr = LinRange(1, 10, 100) * μ1
 
 
 
