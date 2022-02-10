@@ -83,6 +83,8 @@ plot!(μr / (ħ * wz), m2 ./ G2, xaxis = :log, yaxis = :log, label = L"2.5\mu", 
 plot!(μr / (ħ * wz), m3 ./ G3, xaxis = :log, yaxis = :log, label = L"3\mu", size = (600, 300), line = (:red), scale = :log10, minorticks = true, grid = false)
 xlabel!(L"\mu/\hbar\omega_x")
 ylabel!(L"\Gamma_{M_1}/ \Gamma_\gamma")
+using Plots.Measures
+plot!(bottom_margin = 0.3cm)
 savefig("dampratecut_comp.pdf")
 
 #################
@@ -117,7 +119,7 @@ vline!([0.5wr / wz], label = L"50\hbar\omega_x")
 xlabel!(L"\mu/\hbar\omega_x")
 ylabel!(L"\Gamma/\omega_s")
 
-
+plot!(bottom_margin = 0.3cm)
 savefig("damprateT.pdf")
 
 plot(μr / (ħ * wz), MT1 ./ GT1, xaxis = :log, yaxis = :log, label = L"12nK", size = (600, 300), line = (:blue), legend = :bottomright)
@@ -125,4 +127,5 @@ plot!(μr / (ħ * wz), MT2 ./ GT2, xaxis = :log, yaxis = :log, label = L"30nK", 
 plot!(μr / (ħ * wz), MT3 ./ GT3, xaxis = :log, yaxis = :log, label = L"48nK", size = (600, 300), line = (:red), scale = :log10, minorticks = true, grid = false)
 xlabel!(L"\mu/\hbar\omega_x")
 ylabel!(L"\Gamma_{M_1}/ \Gamma_\gamma")
+plot!(bottom_margin = 0.3cm)
 savefig("damprateT_comp.pdf")
